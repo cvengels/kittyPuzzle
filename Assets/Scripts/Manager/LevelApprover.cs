@@ -66,7 +66,8 @@ public class LevelApprover : MonoBehaviour
                                     {
                                         countTiles++;
                                         //Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
-                                        Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
+                                        GameObject tmp = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
+                                        tmp.name = spawner.name + countTiles;
                                     }
                                 }
                             }
