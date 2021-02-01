@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controls.Main.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
+
+        // Find tilemaps for the player to walk in the level
         if (GameObject.Find("Grid/GroundTilemap"))
         {
             groundTilemap = GameObject.Find("Grid/GroundTilemap").GetComponent<Tilemap>();

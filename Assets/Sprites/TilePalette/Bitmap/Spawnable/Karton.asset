@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Box
+  m_Name: Karton
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -2397908109975651057, guid: c8bf50adb0d387c4a9fa2e798144216f,
-    type: 3}
+  m_Sprite: {fileID: 21300000, guid: bdfef6638f6b5d544b31799788a3ae66, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

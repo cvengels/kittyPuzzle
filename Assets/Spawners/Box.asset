@@ -15,7 +15,7 @@ MonoBehaviour:
   nameOfEntity: Karton
   spawnableGameObject: {fileID: 7425412222720616817, guid: 84ed3d8c07e22014f863adecb0e0931b,
     type: 3}
-  spawnerTile: {fileID: 11400000, guid: 8cb7ade55c63c89488ebdad54d9c7caa, type: 2}
+  spawnerTile: {fileID: 11400000, guid: 20fcb812fe406184195baf811f07a686, type: 2}
   minimumSpawners: 0
   maximumSpawners: 0
   isPlayable: 0

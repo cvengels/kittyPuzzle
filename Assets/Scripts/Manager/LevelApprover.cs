@@ -6,9 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class LevelApprover : MonoBehaviour
 {
-    public Tilemap spawnMap;
+    private Tilemap spawnMap;
 
-    public SpawnableObjectBehaviour[] spawnableGameBojects;
+    public SpawnableObjectBehaviour[] spawnableGameObjects;
 
 
     void Awake()
@@ -18,38 +18,60 @@ public class LevelApprover : MonoBehaviour
 
     void Start()
     {
-        SearchForSpawners(spawnMap, spawnableGameBojects);
+        // Find tilemaps for the player to walk in the level
+        if (GameObject.Find("Grid/SpawnerTilemap"))
+        {
+            spawnMap = GameObject.Find("Grid/SpawnerTilemap").GetComponent<Tilemap>();
+        }
+        else
+        {
+            Debug.LogError("Spawner-Tilemap nicht gefunden!");
+        }
+
+        SearchForSpawners(spawnMap, spawnableGameObjects);
     }
 
     void SearchForSpawners(Tilemap tileMap, SpawnableObjectBehaviour[] spawnableObjects)
     {
-        if (spawnableGameBojects.Length > 0)
+        if (spawnableGameObjects.Length > 0)
         {
-
             foreach (SpawnableObjectBehaviour spawner in spawnableObjects)
             {
-                Debug.Log("Objekte vom Typ " + spawner.nameOfEntity + " werden gesucht ...");
-
-                if (spawnMap.ContainsTile(spawner.spawnerTile))
+                if (spawner != null)
                 {
-                    Debug.Log("Objekte vom Typ " + spawner.nameOfEntity + " wurden gefunden!");
-                    BoundsInt bounds = tileMap.cellBounds;
-                    TileBase[] allTiles = tileMap.GetTilesBlock(bounds);
-
-                    for (int x = 0; x < bounds.size.x; x++)
+                    if (spawner.name == "" ||
+                        spawner.spawnableGameObject == null ||
+                        spawner.spawnerTile == null ||
+                        spawner.minimumSpawners > spawner.maximumSpawners)
                     {
-                        for (int y = 0; y < bounds.size.y; y++)
+                        Debug.LogWarning("Spawner \"" + spawner.nameOfEntity + "\" übersprungen, fehlerhafte Einträge im Inspector!");
+                        continue;
+                    }
+                    Debug.Log("Objekte vom Typ " + spawner.nameOfEntity + " werden gesucht ...");
+
+                    if (tileMap.ContainsTile(spawner.spawnerTile))
+                    {
+                        int countTiles = 0;
+                        BoundsInt bounds = tileMap.cellBounds;
+                        TileBase[] allTiles = tileMap.GetTilesBlock(bounds);
+
+                        for (int x = 0; x < bounds.size.x; x++)
                         {
-                            TileBase tile = allTiles[x + y * bounds.size.x];
-                            if (tile != null)
+                            for (int y = 0; y < bounds.size.y; y++)
                             {
-                                if (tile == spawner.spawnerTile)
+                                TileBase tile = allTiles[x + y * bounds.size.x];
+                                if (tile != null)
                                 {
-                                    Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
-                                    Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
+                                    if (tile == spawner.spawnerTile)
+                                    {
+                                        countTiles++;
+                                        //Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
+                                        Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
+                                    }
                                 }
                             }
                         }
+                        Debug.Log(countTiles + "x " + spawner.nameOfEntity + " gespawnt");
                     }
                 }
             }
