@@ -10,15 +10,34 @@ public class PlayerController : MonoBehaviour
     Vector3 nextPosition;
     private bool isMoving;
 
-    [SerializeField]
     private Tilemap groundTilemap;
-    [SerializeField]
     private Tilemap collisionTilemap;
 
 
     private void Awake()
     {
         controls = new PlayerMovement();
+    }
+
+    void Start()
+    {
+        controls.Main.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
+        if (GameObject.Find("Grid/GroundTilemap"))
+        {
+            groundTilemap = GameObject.Find("Grid/GroundTilemap").GetComponent<Tilemap>();
+        }
+        else
+        {
+            Debug.LogError("Boden-Tilemap nicht gefunden!");
+        }
+        if (GameObject.Find("Grid/CollisionTilemap"))
+        {
+            collisionTilemap = GameObject.Find("Grid/CollisionTilemap").GetComponent<Tilemap>();
+        }
+        else
+        {
+            Debug.LogError("Kollisions-Tilemap nicht gefunden!");
+        }
     }
 
     private void OnEnable()
@@ -31,11 +50,6 @@ public class PlayerController : MonoBehaviour
         controls.Disable();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        controls.Main.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
-    }
 
     private void Update()
     {
@@ -68,7 +82,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector3Int gridPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
 
-        
+
 
         if (!groundTilemap.HasTile(gridPosition) || collisionTilemap.HasTile(gridPosition))
         {
