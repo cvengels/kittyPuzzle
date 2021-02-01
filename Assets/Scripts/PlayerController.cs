@@ -88,8 +88,8 @@ public class PlayerController : MonoBehaviour
 
         if (!groundTilemap.HasTile(gridPosition) || collisionTilemap.HasTile(gridPosition))
         {
-            string nameOfTile = collisionTilemap.GetTile(gridPosition).name;
-            Debug.Log("Hindernis heißt " + nameOfTile);
+            //string nameOfTile = collisionTilemap.GetTile(gridPosition).name;
+            //Debug.Log("Hindernis heißt " + nameOfTile);
             return false;
         }
         return true;

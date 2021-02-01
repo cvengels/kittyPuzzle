@@ -47,8 +47,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 30
-  groundTilemap: {fileID: 0}
-  collisionTilemap: {fileID: 0}
 --- !u!61 &2728290336254931907
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -83,7 +81,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2728290336254931908}
-  m_BodyType: 1
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0

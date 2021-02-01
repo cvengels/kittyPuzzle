@@ -42,7 +42,8 @@ public class LevelApprover : MonoBehaviour
                     if (spawner.name == "" ||
                         spawner.spawnableGameObject == null ||
                         spawner.spawnerTile == null ||
-                        spawner.minimumSpawners > spawner.maximumSpawners)
+                        (spawner.minimumSpawners > spawner.maximumSpawners || 
+                            (spawner.minimumSpawners > 0 && spawner.maximumSpawners == 0)))
                     {
                         Debug.LogWarning("Spawner \"" + spawner.nameOfEntity + "\" übersprungen, fehlerhafte Einträge im Inspector!");
                         continue;
@@ -51,6 +52,9 @@ public class LevelApprover : MonoBehaviour
 
                     if (tileMap.ContainsTile(spawner.spawnerTile))
                     {
+                        GameObject tmpParent = new GameObject();
+                        tmpParent.name = spawner.name + "Container";
+
                         int countTiles = 0;
                         BoundsInt bounds = tileMap.cellBounds;
                         TileBase[] allTiles = tileMap.GetTilesBlock(bounds);
@@ -66,8 +70,11 @@ public class LevelApprover : MonoBehaviour
                                     {
                                         countTiles++;
                                         //Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
-                                        GameObject tmp = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
-                                        tmp.name = spawner.name + countTiles;
+                                        GameObject tmpChild = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
+                                        tmpChild.name = spawner.name + countTiles;
+
+                                        //Instanciate one parent GameObject to sort all spawned children
+                                        tmpChild.transform.parent = tmpParent.transform;
                                     }
                                 }
                             }
@@ -76,6 +83,7 @@ public class LevelApprover : MonoBehaviour
                     }
                 }
             }
+            Debug.Log("Spawner-Suche beendet");
             spawnMap.ClearAllTiles();
         }
     }

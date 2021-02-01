@@ -12,10 +12,15 @@ public class SpawnableObjectBehaviour : ScriptableObject
     public Tile spawnerTile;
     public int minimumSpawners;
     public int maximumSpawners;
+    public float moveSpeed = 30f;
 
     // Properties of spawned entity
     public bool isPlayable;
+    public bool isVulnerable;
+    public bool isMassive;
     public bool isPushable;
-    public bool isDangerous;
+    public bool isHeavy;
+    public bool isHole;
+   
 
 }
