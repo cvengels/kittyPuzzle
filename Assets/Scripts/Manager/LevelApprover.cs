@@ -6,14 +6,17 @@ using UnityEngine.SceneManagement;
 
 public class LevelApprover : MonoBehaviour
 {
-    private Tilemap spawnMap;
 
+    public static LevelApprover current;
+
+    private Tilemap spawnMap;
     public SpawnableObjectBehaviour[] spawnableGameObjects;
 
 
     void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
+        current = this;
     }
 
     void Start()
@@ -42,7 +45,7 @@ public class LevelApprover : MonoBehaviour
                     if (spawner.name == "" ||
                         spawner.spawnableGameObject == null ||
                         spawner.spawnerTile == null ||
-                        (spawner.minimumSpawners > spawner.maximumSpawners || 
+                        (spawner.minimumSpawners > spawner.maximumSpawners ||
                             (spawner.minimumSpawners > 0 && spawner.maximumSpawners == 0)))
                     {
                         Debug.LogWarning("Spawner \"" + spawner.nameOfEntity + "\" übersprungen, fehlerhafte Einträge im Inspector!");

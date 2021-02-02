@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviour
         {
             isMoving = false;
             transform.position = nextPosition;
+            EventManager.current.PlayerFinishedMove();
         }
     }
 
