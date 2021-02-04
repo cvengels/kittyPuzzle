@@ -14,6 +14,26 @@ public class EventManager : MonoBehaviour
         current = this;
     }
 
+    public event Action onSpawnerFinished;
+    public void SpawnerFinished()
+    {
+        if (onSpawnerFinished != null)
+        {
+            onSpawnerFinished();
+        }
+    }
+
+    // Nur für Debugging!
+    public event Action onMoveTimer;
+    public void MoveTimer()
+    {
+        if (onMoveTimer != null)
+        {
+            onMoveTimer();
+        }
+    }
+
+
     public event Action onPlayerFinishedMove;
     public void PlayerFinishedMove()
     {

@@ -17,10 +17,7 @@ public class LevelApprover : MonoBehaviour
     {
         DontDestroyOnLoad(this.gameObject);
         current = this;
-    }
 
-    void Start()
-    {
         // Find tilemaps for the player to walk in the level
         if (GameObject.Find("Grid/SpawnerTilemap"))
         {
@@ -30,8 +27,6 @@ public class LevelApprover : MonoBehaviour
         {
             Debug.LogError("Spawner-Tilemap nicht gefunden!");
         }
-
-        SearchForSpawners(spawnMap, spawnableGameObjects);
     }
 
     void SearchForSpawners(Tilemap tileMap, SpawnableObjectBehaviour[] spawnableObjects)
@@ -55,8 +50,11 @@ public class LevelApprover : MonoBehaviour
 
                     if (tileMap.ContainsTile(spawner.spawnerTile))
                     {
-                        GameObject tmpParent = new GameObject();
-                        tmpParent.name = spawner.name + "Container";
+                        //Instanciate one parent GameObject to sort all spawned children
+                        GameObject tmpParent = new GameObject
+                        {
+                            name = spawner.name + "Container"
+                        };
 
                         int countTiles = 0;
                         BoundsInt bounds = tileMap.cellBounds;
@@ -73,10 +71,26 @@ public class LevelApprover : MonoBehaviour
                                     {
                                         countTiles++;
                                         //Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
-                                        GameObject tmpChild = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + 0.5f, tileMap.origin.y + y + 0.5f, 0f), Quaternion.identity);
+                                        GameObject tmpChild = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + tileMap.tileAnchor.x, tileMap.origin.y + y + tileMap.tileAnchor.y, 0f), Quaternion.identity);
                                         tmpChild.name = spawner.name + countTiles;
 
-                                        //Instanciate one parent GameObject to sort all spawned children
+                                        // Set spawner properties to instance properties
+                                        if (tmpChild.GetComponent<ObjectGridInteraction>())
+                                        {
+                                            ObjectGridInteraction tmpGridInteraction = tmpChild.GetComponent<ObjectGridInteraction>();
+                                            tmpGridInteraction.NameOfObject = spawner.name;
+                                            tmpGridInteraction.MovementSpeed = spawner.moveSpeed;
+                                            tmpGridInteraction.IsPlayable = spawner.isPlayable;
+                                            tmpGridInteraction.IsVulnerable = spawner.isVulnerable;
+                                            tmpGridInteraction.IsMassive = spawner.isMassive;
+                                            tmpGridInteraction.IsPushable = spawner.isPushable;
+                                            tmpGridInteraction.IsHeavy = spawner.isHeavy;
+                                            tmpGridInteraction.IsHole = spawner.isHole;
+
+                                        }
+                                        
+
+                                        // Add child object to parent
                                         tmpChild.transform.parent = tmpParent.transform;
                                     }
                                 }
@@ -88,6 +102,7 @@ public class LevelApprover : MonoBehaviour
             }
             Debug.Log("Spawner-Suche beendet");
             spawnMap.ClearAllTiles();
+            EventManager.current.SpawnerFinished();
         }
     }
 
@@ -106,5 +121,6 @@ public class LevelApprover : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log("OnSceneLoaded: " + scene.name);
+        SearchForSpawners(spawnMap, spawnableGameObjects);
     }
 }

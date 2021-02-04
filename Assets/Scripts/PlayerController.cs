@@ -1,99 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class PlayerController : MonoBehaviour
 {
-    private PlayerMovement controls;
-    public float speed = 1;
-    Vector3 nextPosition;
-    private bool isMoving;
+    ObjectGridInteraction gridInteractor;
 
-    private Tilemap groundTilemap;
-    private Tilemap collisionTilemap;
-
-
-    private void Awake()
+    private void Start()
     {
-        controls = new PlayerMovement();
+        gridInteractor = GetComponent<ObjectGridInteraction>();
     }
-
-    void Start()
-    {
-        controls.Main.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
-
-        // Find tilemaps for the player to walk in the level
-        if (GameObject.Find("Grid/GroundTilemap"))
-        {
-            groundTilemap = GameObject.Find("Grid/GroundTilemap").GetComponent<Tilemap>();
-        }
-        else
-        {
-            Debug.LogError("Boden-Tilemap nicht gefunden!");
-        }
-        if (GameObject.Find("Grid/CollisionTilemap"))
-        {
-            collisionTilemap = GameObject.Find("Grid/CollisionTilemap").GetComponent<Tilemap>();
-        }
-        else
-        {
-            Debug.LogError("Kollisions-Tilemap nicht gefunden!");
-        }
-    }
-
-    private void OnEnable()
-    {
-        controls.Enable();
-    }
-
-    private void OnDisable()
-    {
-        controls.Disable();
-    }
-
 
     private void Update()
     {
-        if (isMoving)
+        if (Input.GetKeyDown(KeyCode.W))
         {
-            transform.position = Vector3.Lerp(transform.position,
-                new Vector3(
-                    nextPosition.x,
-                    nextPosition.y,
-                    0),
-                Time.deltaTime * speed);
+            gridInteractor.AskToMove(Vector2.up);
         }
-        if (Vector3.Distance(transform.position, nextPosition) < 0.02 && isMoving)
+        else if (Input.GetKeyDown(KeyCode.A))
         {
-            isMoving = false;
-            transform.position = nextPosition;
-            EventManager.current.PlayerFinishedMove();
+            gridInteractor.AskToMove(Vector2.left);
         }
-    }
-
-    private void Move(Vector2 direction)
-    {
-        if (CanMove(direction) && !isMoving)
+        else if (Input.GetKeyDown(KeyCode.S))
         {
-            nextPosition = transform.position + (Vector3)direction;
-            isMoving = true;
+            gridInteractor.AskToMove(Vector2.down);
         }
-    }
-
-    private bool CanMove(Vector2 direction)
-    {
-        Vector3Int gridPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
-
-
-
-        if (!groundTilemap.HasTile(gridPosition) || collisionTilemap.HasTile(gridPosition))
+        else if (Input.GetKeyDown(KeyCode.D))
         {
-            //string nameOfTile = collisionTilemap.GetTile(gridPosition).name;
-            //Debug.Log("Hindernis heißt " + nameOfTile);
-            return false;
+            gridInteractor.AskToMove(Vector2.right);
         }
-        return true;
     }
 
 }

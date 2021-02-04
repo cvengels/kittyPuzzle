@@ -18,9 +18,9 @@ MonoBehaviour:
   spawnerTile: {fileID: 11400000, guid: de0e7abac35d162449d69065a7303343, type: 2}
   minimumSpawners: 1
   maximumSpawners: 1
-  moveSpeed: 30
+  moveSpeed: 15
   isPlayable: 1
-  isVulnerable: 0
+  isVulnerable: 1
   isMassive: 1
   isPushable: 0
   isHeavy: 0
