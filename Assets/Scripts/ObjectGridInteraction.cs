@@ -5,8 +5,14 @@ using UnityEngine.Tilemaps;
 
 public class ObjectGridInteraction : MonoBehaviour
 {
-    public PositionTarget positionTarget;
-    bool isMoving;
+    private Tilemap groundTilemap;
+    private Tilemap collisionTilemap;
+
+    private bool isMoving;
+    private bool pushing;
+    private float movementSpeedOverwrite;
+
+    private Vector3 newMovePosition;
 
     // Properties of spawned entity
     [SerializeField]
@@ -66,15 +72,150 @@ public class ObjectGridInteraction : MonoBehaviour
         set { isHole = value; }
     }
 
+    void OnDrawGizmosSelected()
+    {
+        // Display the explosion radius when selected
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(newMovePosition, 0.25f);
+    }
+
     void Start()
     {
-        positionTarget = Instantiate(positionTarget);
-        positionTarget.name = this.name + "PositionTarget";
-        positionTarget.transform.parent = GameObject.Find(this.NameOfObject + "Container").transform;
-        positionTarget.transform.position = this.transform.position;
+        // Find tilemaps for the player to walk in the level
+        if (GameObject.Find("Grid/GroundTilemap"))
+        {
+            groundTilemap = GameObject.Find("Grid/GroundTilemap").GetComponent<Tilemap>();
+        }
+        else
+        {
+            Debug.LogError("Boden-Tilemap nicht gefunden!");
+        }
+        if (GameObject.Find("Grid/CollisionTilemap"))
+        {
+            collisionTilemap = GameObject.Find("Grid/CollisionTilemap").GetComponent<Tilemap>();
+        }
+        else
+        {
+            Debug.LogError("Kollisions-Tilemap nicht gefunden!");
+        }
 
         //EventManager.current.onMoveTimer += MoveInRandomDirection;
     }
+
+
+    void Update()
+    {
+        if (isMoving)
+        {
+            if (!pushing) // normal movement of e.g. player
+            {
+                transform.position = Vector3.Lerp(transform.position, newMovePosition, movementSpeed * Time.deltaTime);
+            }
+            else // when pushing one or more objects, this gameobject gets a new speed and moves linearly
+            {
+                transform.position = Vector3.MoveTowards(transform.position, newMovePosition, movementSpeedOverwrite * Time.deltaTime);
+            }
+
+            if (Vector3.Distance(transform.position, newMovePosition) < 0.02f)
+            {
+                isMoving = false;
+                pushing = false;
+                transform.position = newMovePosition;
+
+                if (this.transform.CompareTag("Player"))
+                {
+                    EventManager.current.PlayerFinishMove();
+                }
+            }
+        }
+    }
+
+
+    public bool AskToMove(Vector2 direction)
+    {
+        if (!isMoving)
+        {
+            if (CanMoveOnGrid(direction))
+            {
+                newMovePosition = transform.position + (Vector3)direction;
+                if (CheckForObjectsOnTarget(newMovePosition).Count == 0)
+                {
+                    //Debug.Log(this.name + " soll von " + transform.position.ToString() + " zu " + newMovePosition.ToString());
+                    isMoving = true;
+                    if (this.transform.CompareTag("Player"))
+                    {
+                        EventManager.current.PlayerStartMove();
+                    }
+                    return true;
+
+                }
+                else
+                {
+                    List<GameObject> objectsInPath = CheckForObjectsOnTarget(newMovePosition);
+                    /*
+                    string objectNames = "";
+                    foreach (GameObject go in objectsInPath)
+                    {
+                        objectNames += go.name + " ";
+                    }
+                    Debug.Log(this.name + ": Objekte vor mir: " + objectNames);
+                    */
+                    if (objectsInPath.Count == 1)
+                    {
+                        ObjectGridInteraction objectInFrontOfMe = objectsInPath[0].GetComponent<ObjectGridInteraction>();
+                        if (objectInFrontOfMe.AskToMove(direction) && objectInFrontOfMe.isPushable)
+                        {
+                            movementSpeedOverwrite = objectInFrontOfMe.movementSpeed < this.movementSpeed ? 
+                                objectInFrontOfMe.movementSpeed : this.movementSpeed;
+                            isMoving = true;
+                            pushing = true;
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private bool CanMoveOnGrid(Vector2 direction)
+    {
+        Vector3Int gridTargetPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
+        if (!groundTilemap.HasTile(gridTargetPosition) || collisionTilemap.HasTile(gridTargetPosition))
+        {
+            //string nameOfTile = collisionTilemap.GetTile(gridPosition).name;
+            //Debug.Log("Hindernis heißt " + nameOfTile);
+            return false;
+        }
+        return true;
+    }
+
+
+    private List<GameObject> CheckForObjectsOnTarget(Vector3 targetPosition)
+    {
+        // https://answers.unity.com/questions/383671/find-gameobject-at-position.html
+
+        Collider2D[] colliders;
+        List<GameObject> gameObjects = new List<GameObject>(); ;
+
+        //Presuming the object you are testing also has a collider 0 otherwise
+        colliders = Physics2D.OverlapCircleAll(targetPosition, .2f);
+        if (colliders.Length >= 1)
+        {
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                //This is the game object you collided with
+                GameObject go = colliders[i].gameObject;
+                if (!go.GetComponent<PositionTarget>())
+                {
+                    gameObjects.Add(go);
+                }
+            }
+        }
+        return gameObjects;
+    }
+
 
     /*
     private void MoveInRandomDirection()
@@ -94,51 +235,4 @@ public class ObjectGridInteraction : MonoBehaviour
         }
     }
     */
-
-    void Update()
-    {
-        if (isMoving)
-        {
-            transform.position = Vector3.Lerp(transform.position, positionTarget.transform.position, MovementSpeed * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, positionTarget.transform.position) < 0.02f)
-            {
-                isMoving = false;
-                transform.position = positionTarget.transform.position;
-
-                EventManager.current.PlayerFinishedMove();
-            }
-        }
-    }
-
-    public bool AskToMove(Vector2 direction)
-    {
-        if (!isMoving)
-        {
-            if (positionTarget.CanMoveOnGrid(direction))
-            {
-                positionTarget.MoveInDirection(direction);
-                if (positionTarget.CheckForObjectsInPath().Count == 0)
-                {
-                    //Debug.Log(this.name + " soll von " + transform.position.ToString() + " zu " + positionTarget.transform.position.ToString());
-                    isMoving = true;
-                    return true;
-
-                }
-                else
-                {
-                    List<GameObject> objectsInPath = positionTarget.CheckForObjectsInPath();
-                    string objectNames = "";
-                    foreach (GameObject go in objectsInPath)
-                    {
-                        objectNames += go.name + " ";
-                    }
-                    Debug.Log(this.name + ": Objekte vor mir: " + objectNames);
-                    positionTarget.MoveBack();
-                    return false;
-                }
-            }
-        }
-        return false;
-    }
 }

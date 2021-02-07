@@ -126576,7 +126576,8 @@ PrefabInstance:
         type: 3}
       propertyPath: spawnableGameObjects.Array.data[3]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 5d8fde46c61f8b64c84107bb7e904555,
+        type: 2}
     - target: {fileID: 9162408030754025935, guid: f26fa738ea76e754a9a98b5e10203985,
         type: 3}
       propertyPath: m_RootOrder

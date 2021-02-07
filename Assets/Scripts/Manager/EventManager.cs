@@ -34,12 +34,22 @@ public class EventManager : MonoBehaviour
     }
 
 
-    public event Action onPlayerFinishedMove;
-    public void PlayerFinishedMove()
+    public event Action onPlayerStartMove;
+    public void PlayerStartMove()
     {
-        if (onPlayerFinishedMove != null)
+        if (onPlayerStartMove != null)
         {
-            onPlayerFinishedMove();
+            onPlayerStartMove();
+        }
+    }
+
+
+    public event Action onPlayerFinishMove;
+    public void PlayerFinishMove()
+    {
+        if (onPlayerFinishMove != null)
+        {
+            onPlayerFinishMove();
         }
     }
 
