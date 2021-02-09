@@ -12,6 +12,24 @@ public class EventManager : MonoBehaviour
         current = this;
     }
 
+    public event Action onAddMovingEntity;
+    public void AddMovingEntity()
+    {
+        if (onAddMovingEntity != null)
+        {
+            onAddMovingEntity();
+        }
+    }
+
+    public event Action onRemoveMovingEntity;
+    public void RemoveMovingEntity()
+    {
+        if (onRemoveMovingEntity != null)
+        {
+            onRemoveMovingEntity();
+        }
+    }
+
     public event Action onEnablePlayerMovement;
     public void EnablePlayerMovement()
     {

@@ -5,20 +5,48 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    private bool playerCanMove;
+    private int movingObjects;
+    public int MovingObjects
+    {
+        get { return movingObjects; }
+    }
 
+
+    [SerializeField]
+    private bool playerCanMove;
     public bool PlayerCanMove
     {
         get { return playerCanMove; }
     }
 
-    ObjectGridInteraction gridInteractor;
-    ObjectGridInteraction playerObject;
+    ObjectGridInteraction playerReference;
 
     private void Start()
     {
-        gridInteractor = GetComponent<ObjectGridInteraction>();
-        playerObject = GetComponent<ObjectGridInteraction>();
+        playerReference = GetComponent<ObjectGridInteraction>();
+
+        EventManager.current.onAddMovingEntity += AddEntityInt;
+        EventManager.current.onRemoveMovingEntity += RemoveEntityInt;
+    }
+
+
+    private void AddEntityInt()
+    {
+        movingObjects++;
+        Debug.Log("Moving Objects (Add): " + movingObjects);
+        if (movingObjects > 0)
+        {
+            DisablePlayerControl();
+        }
+    }
+    private void RemoveEntityInt()
+    {
+        movingObjects--;
+        Debug.Log("Moving Objects (Del): " + movingObjects);
+        if (movingObjects == 0)
+        {
+            EnablePlayerControl();
+        }
     }
 
     private void EnablePlayerControl()
@@ -39,19 +67,19 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.W))
             {
-                gridInteractor.AskToMove(Vector2.up, playerObject.MyData.moveSpeed);
+                playerReference.AskToMove(Vector2.up, playerReference.MyData.moveSpeed);
             }
             else if (Input.GetKeyDown(KeyCode.A))
             {
-                gridInteractor.AskToMove(Vector2.left, playerObject.MyData.moveSpeed);
+                playerReference.AskToMove(Vector2.left, playerReference.MyData.moveSpeed);
             }
             else if (Input.GetKeyDown(KeyCode.S))
             {
-                gridInteractor.AskToMove(Vector2.down, playerObject.MyData.moveSpeed);
+                playerReference.AskToMove(Vector2.down, playerReference.MyData.moveSpeed);
             }
             else if (Input.GetKeyDown(KeyCode.D))
             {
-                gridInteractor.AskToMove(Vector2.right, playerObject.MyData.moveSpeed);
+                playerReference.AskToMove(Vector2.right, playerReference.MyData.moveSpeed);
             }
             else if (Input.GetKeyDown(KeyCode.R))
             {
@@ -59,6 +87,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
 
     void OnEnable()
     {

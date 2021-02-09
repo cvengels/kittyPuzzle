@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   publicProperties:
     nameOfEntity: Player
-    moveSpeed: 20
+    moveSpeed: 6
     isPlayable: 1
     isVulnerable: 1
     isPushable: 0
     isHeavy: 0
     isHole: 0
+    isTrigger: 0
   spawnableGameObject: {fileID: 2728290336254931908, guid: b810d337d830a444d8f15332bc0645f2,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: de0e7abac35d162449d69065a7303343, type: 2}

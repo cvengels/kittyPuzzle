@@ -106,8 +106,10 @@ public class ObjectGridInteraction : MonoBehaviour
             {
                 transform.position = Vector3.MoveTowards(
                     transform.position,
-                    Vector3.Lerp(transform.position, newMovePosition, myData.moveSpeed / 10),
+                    Vector3.Lerp(transform.position, newMovePosition, myData.moveSpeed),
                     newMovementSpeedCalculated * Time.fixedDeltaTime);
+
+
             }
 
             // If own position near target position, move directly to new position and quit moving task
@@ -117,10 +119,7 @@ public class ObjectGridInteraction : MonoBehaviour
                 pushing = false;
                 transform.position = newMovePosition;
 
-                if (transform.CompareTag("Player"))
-                {
-                    EventManager.current.PlayerFinishMove();
-                }
+                EventManager.current.RemoveMovingEntity();
             }
         }
     }
@@ -143,6 +142,7 @@ public class ObjectGridInteraction : MonoBehaviour
                     {
                         isMoving = true;
                         pushing = false;
+                        EventManager.current.AddMovingEntity();
                         AudioManager.current.Play("CatMoving");
                         return newMovementSpeedCalculated;
                     }
@@ -164,6 +164,7 @@ public class ObjectGridInteraction : MonoBehaviour
                             {
                                 isMoving = true;
                                 pushing = true;
+                                EventManager.current.AddMovingEntity();
                                 AudioManager.current.Play("BoxPush");
                                 return newMovementSpeedCalculated;
                             }
@@ -177,6 +178,8 @@ public class ObjectGridInteraction : MonoBehaviour
                         {
                             isMoving = true;
                             pushing = false;
+                            EventManager.current.AddMovingEntity();
+                            AudioManager.current.Play("CatMoving");
                             return newMovementSpeedCalculated;
                         }
                     }
