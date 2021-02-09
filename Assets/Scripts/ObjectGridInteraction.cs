@@ -173,6 +173,12 @@ public class ObjectGridInteraction : MonoBehaviour
                                 return 0f;
                             }
                         }
+                        if (objectInFrontOfMe.MyData.isTrigger)
+                        {
+                            isMoving = true;
+                            pushing = false;
+                            return newMovementSpeedCalculated;
+                        }
                     }
                     else // more than one object, e.g. a button, hole and a box on top
                     {

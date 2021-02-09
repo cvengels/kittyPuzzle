@@ -1,8 +1,17 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField]
+    private bool playerCanMove;
+
+    public bool PlayerCanMove
+    {
+        get { return playerCanMove; }
+    }
+
     ObjectGridInteraction gridInteractor;
     ObjectGridInteraction playerObject;
 
@@ -12,28 +21,55 @@ public class PlayerController : MonoBehaviour
         playerObject = GetComponent<ObjectGridInteraction>();
     }
 
+    private void EnablePlayerControl()
+    {
+        Debug.Log("Spieler-Steuerung freigegeben!");
+        playerCanMove = true;
+    }
+    private void DisablePlayerControl()
+    {
+        Debug.Log("Spieler-Steuerung gesperrt!");
+        playerCanMove = false;
+    }
+
+
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W))
+        if (playerCanMove)
         {
-            gridInteractor.AskToMove(Vector2.up, playerObject.MyData.moveSpeed);
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                gridInteractor.AskToMove(Vector2.up, playerObject.MyData.moveSpeed);
+            }
+            else if (Input.GetKeyDown(KeyCode.A))
+            {
+                gridInteractor.AskToMove(Vector2.left, playerObject.MyData.moveSpeed);
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                gridInteractor.AskToMove(Vector2.down, playerObject.MyData.moveSpeed);
+            }
+            else if (Input.GetKeyDown(KeyCode.D))
+            {
+                gridInteractor.AskToMove(Vector2.right, playerObject.MyData.moveSpeed);
+            }
+            else if (Input.GetKeyDown(KeyCode.R))
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.A))
-        {
-            gridInteractor.AskToMove(Vector2.left, playerObject.MyData.moveSpeed);
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            gridInteractor.AskToMove(Vector2.down, playerObject.MyData.moveSpeed);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            gridInteractor.AskToMove(Vector2.right, playerObject.MyData.moveSpeed);
-        }
-        else if (Input.GetKeyDown(KeyCode.R))
-        {
-            SceneManager.LoadScene(0);
-        }
+    }
+
+    void OnEnable()
+    {
+        EventManager.current.onEnablePlayerMovement += EnablePlayerControl;
+        EventManager.current.onDisablePlayerMovement += DisablePlayerControl;
+    }
+
+    void OnDisable()
+    {
+        EventManager.current.onEnablePlayerMovement -= EnablePlayerControl;
+        EventManager.current.onDisablePlayerMovement -= DisablePlayerControl;
     }
 
 }

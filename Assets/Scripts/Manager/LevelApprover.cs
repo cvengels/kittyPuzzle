@@ -10,6 +10,8 @@ public class LevelApprover : MonoBehaviour
     private Tilemap spawnMap;
     public SpawnableObjectBehaviour[] spawnableGameObjects;
 
+    private bool spawnerSearchFinished;
+
 
     void Awake()
     {
@@ -17,20 +19,6 @@ public class LevelApprover : MonoBehaviour
         current = this;
     }
 
-    void Start()
-    {
-        // Find tilemaps for the player and interactive elements on the grid
-        if (GameObject.Find("Grid/SpawnerTilemap"))
-        {
-            spawnMap = GameObject.Find("Grid/SpawnerTilemap").GetComponent<Tilemap>();
-        }
-        else
-        {
-            Debug.LogError("Spawner-Tilemap nicht gefunden!");
-        }
-
-        SearchForSpawners(spawnMap, spawnableGameObjects);
-    }
 
     void SearchForSpawners(Tilemap tileMap, SpawnableObjectBehaviour[] spawnableObjects)
     {
@@ -133,21 +121,18 @@ public class LevelApprover : MonoBehaviour
                     }
                     else if (spawner == null)
                     {
-                        Debug.LogError("Spawner vom Typ existiert nicht!");
+                        Debug.LogError("Spawner existiert nicht!");
                     }
                     else if (tileMap == null)
                     {
                         Debug.LogError("Tilemap existiert nicht!");
-                    }
-                    else
-                    {
-                        Debug.Log("Kachel vom Typ " + spawner.name + " gefunden.");
                     }
                 }
             }
             Debug.Log("Spawner-Suche beendet");
             spawnMap.ClearAllTiles();
             EventManager.current.SpawnerFinished();
+            EventManager.current.EnablePlayerMovement();
         }
         else
         {
@@ -157,13 +142,13 @@ public class LevelApprover : MonoBehaviour
 
     void OnEnable()
     {
-        //Debug.Log("OnEnable called");
+        // Whenever a scene is loaded call OnSceneLoaded
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void OnDisable()
     {
-        //Debug.Log("OnDisable");
+        // Whenever a scene is loaded call OnSceneLoaded
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
@@ -171,5 +156,27 @@ public class LevelApprover : MonoBehaviour
     {
         Debug.Log("OnSceneLoaded: " + scene.name);
 
+        // Find tilemaps for the player and interactive elements on the grid
+        if (GameObject.Find("SpawnerTilemap"))
+        {
+            spawnMap = GameObject.Find("SpawnerTilemap").GetComponent<Tilemap>();
+        }
+        else
+        {
+            Debug.LogError("Spawner-Tilemap nicht gefunden!");
+        }
+
+        if (spawnMap != null && spawnableGameObjects != null)
+        {
+            SearchForSpawners(spawnMap, spawnableGameObjects);
+        }
+        else if (spawnMap == null)
+        {
+            Debug.LogError("Tilemap existiert nicht!");
+        }
+        else if (spawnableGameObjects == null)
+        {
+            Debug.LogError("Spawner existieren nicht!");
+        }
     }
 }

@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Testlevel.unity
     guid: d37b69122967ce14d81bbfda0d7e8aff
+  - enabled: 1
+    path: Assets/Scenes/Easy1.unity
+    guid: 7c8978689cdc83842953ae488ac12e43
+  - enabled: 1
+    path: Assets/Scenes/Easy2.unity
+    guid: 5e00c92a570a24a409f34fb93b6cbf7f
+  - enabled: 1
+    path: Assets/Scenes/Easy3.unity
+    guid: f1a5d90997a65cc4a92850295022ada2
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: f9e5fab9b637d5c408c9c8e416b04b3b,
       type: 2}

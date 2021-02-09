@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EventManager : MonoBehaviour
@@ -14,22 +12,30 @@ public class EventManager : MonoBehaviour
         current = this;
     }
 
+    public event Action onEnablePlayerMovement;
+    public void EnablePlayerMovement()
+    {
+        if (onEnablePlayerMovement != null)
+        {
+            onEnablePlayerMovement();
+        }
+    }
+
+    public event Action onDisablePlayerMovement;
+    public void DisablePlayerMovement()
+    {
+        if (onDisablePlayerMovement != null)
+        {
+            onDisablePlayerMovement();
+        }
+    }
+
     public event Action onSpawnerFinished;
     public void SpawnerFinished()
     {
         if (onSpawnerFinished != null)
         {
             onSpawnerFinished();
-        }
-    }
-
-    // Nur für Debugging!
-    public event Action onMoveTimer;
-    public void MoveTimer()
-    {
-        if (onMoveTimer != null)
-        {
-            onMoveTimer();
         }
     }
 
