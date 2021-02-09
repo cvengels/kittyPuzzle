@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   publicProperties:
     nameOfEntity: ' Schwere Kiste'
-    moveSpeed: 5
+    moveSpeed: 2.5
     isPlayable: 0
     isVulnerable: 0
     isPushable: 1
     isHeavy: 1
     isHole: 0
+    isTrigger: 0
   spawnableGameObject: {fileID: 7425412222720616817, guid: 34fc7e38fbe7db1469a59ff30d5e5c5d,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: b62fde7b3766ba2468461e82e66d571a, type: 2}

@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   publicProperties:
     nameOfEntity: Leerer Karton
-    moveSpeed: 10
+    moveSpeed: 5
     isPlayable: 0
     isVulnerable: 0
     isPushable: 1
     isHeavy: 0
     isHole: 0
+    isTrigger: 0
   spawnableGameObject: {fileID: 7425412222720616817, guid: 84ed3d8c07e22014f863adecb0e0931b,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: 20fcb812fe406184195baf811f07a686, type: 2}

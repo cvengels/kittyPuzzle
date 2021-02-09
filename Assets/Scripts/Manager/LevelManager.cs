@@ -19,6 +19,7 @@ public class LevelManager : MonoBehaviour
     private void Start()
     {
         EventManager.current.onPlayerReachedGoal += LevelFinished;
+        currentLevel = SceneManager.GetActiveScene().buildIndex;
     }
 
     private void LevelFinished()
@@ -42,7 +43,7 @@ public class LevelManager : MonoBehaviour
         {
             try
             {
-            SceneManager.LoadScene($"Easy{currentLevel}");
+                SceneManager.LoadScene($"Easy{currentLevel}");
             }
             catch
             {

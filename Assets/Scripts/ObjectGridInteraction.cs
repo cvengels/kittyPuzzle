@@ -235,23 +235,4 @@ public class ObjectGridInteraction : MonoBehaviour
         return gameObjects;
     }
 
-
-    /*
-    private void MoveInRandomDirection()
-    {
-        //Debug.Log(this.name + " versucht sich zu bewegen...");
-        int randomAxis = Random.Range(0, 2);
-        int randomMovement = Random.Range(-1, 2);
-        if (randomAxis == 0)
-        {
-            //Debug.Log(this.name + ": Bewege mich entweder links oder rechts um " + randomMovement);
-            AskToMove(new Vector2(randomMovement, 0f));
-        }
-        else if (randomAxis == 1)
-        {
-            //Debug.Log(this.name + ": Bewege mich entweder hoch oder runter um " + randomMovement);
-            AskToMove(new Vector2(0f, randomMovement));
-        }
-    }
-    */
 }
