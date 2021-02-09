@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42739754d30377f44a4e638f89037820, type: 3}
   m_Name: HeavyBox
   m_EditorClassIdentifier: 
-  nameOfEntity: SchwererKarton
+  publicProperties:
+    nameOfEntity: ' Schwere Kiste'
+    moveSpeed: 5
+    isPlayable: 0
+    isVulnerable: 0
+    isPushable: 1
+    isHeavy: 1
+    isHole: 0
   spawnableGameObject: {fileID: 7425412222720616817, guid: 34fc7e38fbe7db1469a59ff30d5e5c5d,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: b62fde7b3766ba2468461e82e66d571a, type: 2}
   minimumSpawners: 0
   maximumSpawners: 0
-  moveSpeed: 2
-  isPlayable: 0
-  isVulnerable: 0
-  isMassive: 1
-  isPushable: 1
-  isHeavy: 1
-  isHole: 0

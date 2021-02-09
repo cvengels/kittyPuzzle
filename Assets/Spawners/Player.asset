@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42739754d30377f44a4e638f89037820, type: 3}
   m_Name: Player
   m_EditorClassIdentifier: 
-  nameOfEntity: Spieler
+  publicProperties:
+    nameOfEntity: Player
+    moveSpeed: 20
+    isPlayable: 1
+    isVulnerable: 1
+    isPushable: 0
+    isHeavy: 0
+    isHole: 0
   spawnableGameObject: {fileID: 2728290336254931908, guid: b810d337d830a444d8f15332bc0645f2,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: de0e7abac35d162449d69065a7303343, type: 2}
   minimumSpawners: 1
   maximumSpawners: 1
-  moveSpeed: 15
-  isPlayable: 1
-  isVulnerable: 1
-  isMassive: 1
-  isPushable: 0
-  isHeavy: 0
-  isHole: 0

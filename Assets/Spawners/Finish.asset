@@ -12,16 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42739754d30377f44a4e638f89037820, type: 3}
   m_Name: Finish
   m_EditorClassIdentifier: 
-  nameOfEntity: Goal
+  publicProperties:
+    nameOfEntity: Finish
+    moveSpeed: 0
+    isPlayable: 0
+    isVulnerable: 0
+    isPushable: 0
+    isHeavy: 0
+    isHole: 0
+    isTrigger: 1
   spawnableGameObject: {fileID: 582376228091852605, guid: df27d13ebf0ee4145a78218130c89221,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: 39ddfdacdfdcf514db94517c3a363393, type: 2}
   minimumSpawners: 1
-  maximumSpawners: 99
-  moveSpeed: 0
-  isPlayable: 0
-  isVulnerable: 0
-  isMassive: 0
-  isPushable: 0
-  isHeavy: 0
-  isHole: 0
+  maximumSpawners: 0

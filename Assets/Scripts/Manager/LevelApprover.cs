@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
 
@@ -17,8 +15,11 @@ public class LevelApprover : MonoBehaviour
     {
         DontDestroyOnLoad(this.gameObject);
         current = this;
+    }
 
-        // Find tilemaps for the player to walk in the level
+    void Start()
+    {
+        // Find tilemaps for the player and interactive elements on the grid
         if (GameObject.Find("Grid/SpawnerTilemap"))
         {
             spawnMap = GameObject.Find("Grid/SpawnerTilemap").GetComponent<Tilemap>();
@@ -27,82 +28,130 @@ public class LevelApprover : MonoBehaviour
         {
             Debug.LogError("Spawner-Tilemap nicht gefunden!");
         }
+
+        SearchForSpawners(spawnMap, spawnableGameObjects);
     }
 
     void SearchForSpawners(Tilemap tileMap, SpawnableObjectBehaviour[] spawnableObjects)
     {
+        // Are spawnable scripted objects added to the array in the inspector?
         if (spawnableGameObjects.Length > 0)
         {
             foreach (SpawnableObjectBehaviour spawner in spawnableObjects)
             {
+                // Skip empty entries
                 if (spawner != null)
                 {
-                    if (spawner.name == "" ||
+                    // validate basic spanwer values
+                    if (spawner.NameOfEntity == "" ||
                         spawner.spawnableGameObject == null ||
                         spawner.spawnerTile == null ||
-                        (spawner.minimumSpawners > spawner.maximumSpawners ||
-                            (spawner.minimumSpawners > 0 && spawner.maximumSpawners == 0)))
+                        spawner.MoveSpeed < 0f)
                     {
-                        Debug.LogWarning("Spawner \"" + spawner.nameOfEntity + "\" übersprungen, fehlerhafte Einträge im Inspector!");
+                        Debug.LogWarning("Spawner \"" + spawner.NameOfEntity + "\" übersprungen, fehlerhafte Einträge im Inspector!");
                         continue;
                     }
-                    Debug.Log("Objekte vom Typ " + spawner.nameOfEntity + " werden gesucht ...");
 
-                    if (tileMap.ContainsTile(spawner.spawnerTile))
+                    // Everything ok with the spawner values
+                    int countTiles = 0;
+                    Debug.Log("Objekte vom Typ " + spawner.NameOfEntity + " werden gesucht ...");
+
+                    if (tileMap != null && spawner != null)
                     {
-                        //Instanciate one parent GameObject to sort all spawned children
-                        GameObject tmpParent = new GameObject
+                        // check if tilemap has tiles of the spawner type
+                        if (tileMap.ContainsTile(spawner.spawnerTile))
                         {
-                            name = spawner.name + "Container"
-                        };
-
-                        int countTiles = 0;
-                        BoundsInt bounds = tileMap.cellBounds;
-                        TileBase[] allTiles = tileMap.GetTilesBlock(bounds);
-
-                        for (int x = 0; x < bounds.size.x; x++)
-                        {
-                            for (int y = 0; y < bounds.size.y; y++)
+                            //Instanciate one parent GameObject to sort all spawned children
+                            GameObject tmpParent = new GameObject
                             {
-                                TileBase tile = allTiles[x + y * bounds.size.x];
-                                if (tile != null)
+                                name = spawner.name + "Container"
+                            };
+
+                            BoundsInt bounds = tileMap.cellBounds;
+                            TileBase[] allTiles = tileMap.GetTilesBlock(bounds);
+
+                            for (int x = 0; x < bounds.size.x; x++)
+                            {
+                                for (int y = 0; y < bounds.size.y; y++)
                                 {
-                                    if (tile == spawner.spawnerTile)
+                                    TileBase tile = allTiles[x + y * bounds.size.x];
+                                    if (tile != null)
                                     {
-                                        countTiles++;
-                                        //Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
-                                        GameObject tmpChild = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + tileMap.tileAnchor.x, tileMap.origin.y + y + tileMap.tileAnchor.y, 0f), Quaternion.identity);
-                                        tmpChild.name = spawner.name + countTiles;
-
-                                        // Set spawner properties to instance properties
-                                        if (tmpChild.GetComponent<ObjectGridInteraction>())
+                                        if (tile == spawner.spawnerTile)
                                         {
-                                            ObjectGridInteraction tmpGridInteraction = tmpChild.GetComponent<ObjectGridInteraction>();
-                                            tmpGridInteraction.NameOfObject = spawner.name;
-                                            tmpGridInteraction.MovementSpeed = spawner.moveSpeed;
-                                            tmpGridInteraction.IsPlayable = spawner.isPlayable;
-                                            tmpGridInteraction.IsVulnerable = spawner.isVulnerable;
-                                            tmpGridInteraction.IsMassive = spawner.isMassive;
-                                            tmpGridInteraction.IsPushable = spawner.isPushable;
-                                            tmpGridInteraction.IsHeavy = spawner.isHeavy;
-                                            tmpGridInteraction.IsHole = spawner.isHole;
+                                            countTiles++;
+                                            //Debug.Log("x:" + x + " y:" + y + " Objekt: " + spawner.nameOfEntity);
+                                            GameObject tmpChild = Instantiate(spawner.spawnableGameObject, new Vector3(tileMap.origin.x + x + tileMap.tileAnchor.x, tileMap.origin.y + y + tileMap.tileAnchor.y, 0f), Quaternion.identity);
+                                            tmpChild.name = spawner.name + countTiles;
 
+                                            // Set spawner properties to instance properties
+                                            if (tmpChild.GetComponent<ObjectGridInteraction>())
+                                            {
+                                                ObjectGridInteraction tmpGridInteraction = tmpChild.GetComponent<ObjectGridInteraction>();
+                                                tmpGridInteraction.MyData = new SpawnableObjectBehaviour.PublicProperties(
+                                                    spawner.NameOfEntity.Replace(" ", ""),
+                                                    spawner.MoveSpeed,
+                                                    spawner.IsPlayable,
+                                                    spawner.IsVulnerable,
+                                                    spawner.IsPushable,
+                                                    spawner.IsHeavy,
+                                                    spawner.IsHole,
+                                                    spawner.IsTrigger);
+                                            }
+
+                                            // Add child object to parent
+                                            tmpChild.transform.parent = tmpParent.transform;
                                         }
-                                        
-
-                                        // Add child object to parent
-                                        tmpChild.transform.parent = tmpParent.transform;
                                     }
                                 }
                             }
+                            // normal (ignore maximum spawn value, you can add as many spawners as you like)
+                            if (spawner.minimumSpawners >= 0 && spawner.maximumSpawners == 0)
+                            {
+                                if (countTiles >= spawner.minimumSpawners)
+                                {
+                                    Debug.Log(countTiles + "x " + spawner.NameOfEntity + " gespawnt");
+                                }
+                            }
+                            // spawn count has to be specific (e.g. start tile)
+                            else if (spawner.minimumSpawners > 0 && spawner.maximumSpawners > 0)
+                            {
+                                // Nothing is ok
+                                if (countTiles < spawner.minimumSpawners || countTiles > spawner.maximumSpawners)
+                                {
+                                    Debug.LogError(countTiles + "x " + spawner.NameOfEntity + " gespawnt, erlaubt sind Min "
+                                        + spawner.minimumSpawners + "x und Max " + spawner.maximumSpawners);
+
+                                }
+                                // Everything is ok
+                                else if (countTiles >= spawner.minimumSpawners && countTiles <= spawner.maximumSpawners)
+                                {
+                                    Debug.Log(countTiles + "x " + spawner.NameOfEntity + " gespawnt");
+                                }
+                            }
                         }
-                        Debug.Log(countTiles + "x " + spawner.nameOfEntity + " gespawnt");
+                    }
+                    else if (spawner == null)
+                    {
+                        Debug.LogError("Spawner vom Typ existiert nicht!");
+                    }
+                    else if (tileMap == null)
+                    {
+                        Debug.LogError("Tilemap existiert nicht!");
+                    }
+                    else
+                    {
+                        Debug.Log("Kachel vom Typ " + spawner.name + " gefunden.");
                     }
                 }
             }
             Debug.Log("Spawner-Suche beendet");
             spawnMap.ClearAllTiles();
             EventManager.current.SpawnerFinished();
+        }
+        else
+        {
+            Debug.LogError("Keine Einträge für Spawner im Level Approver gefunden. Bitte ergänzen!");
         }
     }
 
@@ -121,6 +170,6 @@ public class LevelApprover : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log("OnSceneLoaded: " + scene.name);
-        SearchForSpawners(spawnMap, spawnableGameObjects);
+
     }
 }

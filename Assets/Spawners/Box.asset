@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42739754d30377f44a4e638f89037820, type: 3}
   m_Name: Box
   m_EditorClassIdentifier: 
-  nameOfEntity: Karton
+  publicProperties:
+    nameOfEntity: Leerer Karton
+    moveSpeed: 10
+    isPlayable: 0
+    isVulnerable: 0
+    isPushable: 1
+    isHeavy: 0
+    isHole: 0
   spawnableGameObject: {fileID: 7425412222720616817, guid: 84ed3d8c07e22014f863adecb0e0931b,
     type: 3}
   spawnerTile: {fileID: 11400000, guid: 20fcb812fe406184195baf811f07a686, type: 2}
   minimumSpawners: 0
   maximumSpawners: 0
-  moveSpeed: 10
-  isPlayable: 0
-  isVulnerable: 0
-  isMassive: 1
-  isPushable: 1
-  isHeavy: 0
-  isHole: 0

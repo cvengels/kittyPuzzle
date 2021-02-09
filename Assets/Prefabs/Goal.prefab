@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5139581994854219894}
   - component: {fileID: -666998772401293734}
   - component: {fileID: -2336945641761267148}
+  - component: {fileID: -7895243731030587845}
   m_Layer: 0
   m_Name: Goal
   m_TagString: Finish
@@ -139,11 +140,11 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582376228091852605}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 0.0001
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 0
@@ -164,3 +165,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43b55f5cfc988f84c9fa8ff3f914c3fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-7895243731030587845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 582376228091852605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08bf6b47f6c8a834db466e6a629e5736, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myData:
+    nameOfEntity: 
+    moveSpeed: 0
+    isPlayable: 0
+    isVulnerable: 0
+    isPushable: 0
+    isHeavy: 0
+    isHole: 0
+    isTrigger: 0

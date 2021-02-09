@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -14,90 +14,78 @@ public class ObjectGridInteraction : MonoBehaviour
 
     private Vector3 newMovePosition;
 
-    // Properties of spawned entity
+    private Color gizmoColor;
+
+
     [SerializeField]
-    private string nameOfObject;
-    public string NameOfObject
+    private SpawnableObjectBehaviour.PublicProperties myData;
+    public SpawnableObjectBehaviour.PublicProperties MyData
     {
-        get { return nameOfObject; }
-        set { nameOfObject = value; }
+        get { return myData; }
+        set { myData = value; }
     }
-    [SerializeField]
-    private float movementSpeed;
-    public float MovementSpeed
+
+
+    private int GetSeedFromString(string s)
     {
-        get { return movementSpeed; }
-        set { movementSpeed = value; }
-    }
-    [SerializeField]
-    private bool isPlayable;
-    public bool IsPlayable
-    {
-        get { return isPlayable; }
-        set { isPlayable = value; }
-    }
-    [SerializeField]
-    private bool isVulnerable;
-    public bool IsVulnerable
-    {
-        get { return isVulnerable; }
-        set { isVulnerable = value; }
-    }
-    [SerializeField]
-    private bool isMassive;
-    public bool IsMassive
-    {
-        get { return isMassive; }
-        set { isMassive = value; }
-    }
-    [SerializeField]
-    private bool isPushable;
-    public bool IsPushable
-    {
-        get { return isPushable; }
-        set { isPushable = value; }
-    }
-    [SerializeField]
-    private bool isHeavy;
-    public bool IsHeavy
-    {
-        get { return isHeavy; }
-        set { isHeavy = value; }
-    }
-    [SerializeField]
-    private bool isHole;
-    public bool IsHole
-    {
-        get { return isHole; }
-        set { isHole = value; }
+        string seedInteger = "";
+
+        foreach (char c in s)
+        {
+            char upper = char.ToUpper(c);
+            if (upper < 'A' || upper > 'Z')
+            {
+                continue;
+            }
+            else
+            {
+                int tmp = Convert.ToInt32(upper);
+                seedInteger += tmp;
+            }
+        }
+        try
+        {
+            return Convert.ToInt32(seedInteger);
+        }
+        catch
+        {
+            return 0;
+        }
     }
 
     void OnDrawGizmosSelected()
     {
         // Display the explosion radius when selected
-        Gizmos.color = Color.green;
+        Gizmos.color = gizmoColor;
         Gizmos.DrawWireSphere(newMovePosition, 0.25f);
     }
 
     void Start()
     {
         // Find tilemaps for the player to walk in the level
-        if (GameObject.Find("Grid/GroundTilemap"))
+        if (GameObject.Find("GroundTilemap"))
         {
-            groundTilemap = GameObject.Find("Grid/GroundTilemap").GetComponent<Tilemap>();
+            groundTilemap = GameObject.Find("GroundTilemap").GetComponent<Tilemap>();
         }
         else
         {
             Debug.LogError("Boden-Tilemap nicht gefunden!");
         }
-        if (GameObject.Find("Grid/CollisionTilemap"))
+        if (GameObject.Find("CollisionTilemap"))
         {
-            collisionTilemap = GameObject.Find("Grid/CollisionTilemap").GetComponent<Tilemap>();
+            collisionTilemap = GameObject.Find("CollisionTilemap").GetComponent<Tilemap>();
         }
         else
         {
             Debug.LogError("Kollisions-Tilemap nicht gefunden!");
         }
+
+        // Set Gizmo color by seeding the object name
+        UnityEngine.Random.InitState(GetSeedFromString(myData.nameOfEntity));
+        gizmoColor = Color.HSVToRGB(UnityEngine.Random.Range(0f, 1f), 1f, 1f);
+
+        // Reset target position
+        ResetTargetPosition();
 
         //EventManager.current.onMoveTimer += MoveInRandomDirection;
     }
@@ -118,7 +106,7 @@ public class ObjectGridInteraction : MonoBehaviour
             {
                 transform.position = Vector3.MoveTowards(
                     transform.position,
-                    Vector3.Lerp(transform.position, newMovePosition, movementSpeed / 10),
+                    Vector3.Lerp(transform.position, newMovePosition, myData.moveSpeed / 10),
                     newMovementSpeedCalculated * Time.fixedDeltaTime);
             }
 
@@ -129,7 +117,7 @@ public class ObjectGridInteraction : MonoBehaviour
                 pushing = false;
                 transform.position = newMovePosition;
 
-                if (this.transform.CompareTag("Player"))
+                if (transform.CompareTag("Player"))
                 {
                     EventManager.current.PlayerFinishMove();
                 }
@@ -140,68 +128,66 @@ public class ObjectGridInteraction : MonoBehaviour
 
     public float AskToMove(Vector2 direction, float forwardedSpeed, int pushOrder = 0)
     {
-        if (!isMoving)
+        if (myData.isPlayable || (myData.isPushable && !myData.isTrigger))
         {
-            newMovementSpeedCalculated = movementSpeed;
-            if (CanMoveOnGrid(direction))
+            if (!isMoving)
             {
-                // set new position to move to and check if other GameObjects are on this position
-                newMovePosition = transform.position + (Vector3)direction;
-                List<GameObject> objectsInPath = CheckForObjectsOnTargetPosition(newMovePosition);
-
-                if (objectsInPath.Count == 0)
+                newMovementSpeedCalculated = myData.moveSpeed;
+                if (CanMoveOnGrid(direction))
                 {
-                    isMoving = true;
-                    pushing = false;
-                    return newMovementSpeedCalculated;
-                }
-                else if (objectsInPath.Count == 1)
-                {
-                    // Get reference of object in front of this
-                    ObjectGridInteraction objectInFrontOfMe = objectsInPath[0].GetComponent<ObjectGridInteraction>();
-                    // If GameObject is player, you are first in push order. Otherwise increment value
-                    pushOrder = this.gameObject.CompareTag("Player") ? 0 : pushOrder++;
+                    // set new position to move to and check if other GameObjects are on this position
+                    newMovePosition = transform.position + (Vector3)direction;
+                    List<GameObject> objectsInPath = CheckForObjectsOnTargetPosition(newMovePosition);
 
-                    // Is object in front of me pushable?
-                    if (objectInFrontOfMe.IsPushable)
+                    if (objectsInPath.Count == 0)
                     {
-                        // get movement speed of object in front of me
-                        newMovementSpeedCalculated = objectInFrontOfMe.AskToMove(direction, newMovementSpeedCalculated, pushOrder);
-                        newMovementSpeedCalculated = Mathf.Min(newMovementSpeedCalculated, this.movementSpeed);
+                        isMoving = true;
+                        pushing = false;
+                        AudioManager.current.Play("CatMoving");
+                        return newMovementSpeedCalculated;
+                    }
+                    else if (objectsInPath.Count == 1)
+                    {
+                        // Get reference of object in front of this
+                        ObjectGridInteraction objectInFrontOfMe = objectsInPath[0].GetComponent<ObjectGridInteraction>();
+                        // If GameObject is player, you are first in push order. Otherwise increment value
+                        pushOrder = this.gameObject.CompareTag("Player") ? 0 : pushOrder++;
 
-                        if (newMovementSpeedCalculated > 0f)
+                        // Is object in front of me pushable?
+                        if (objectInFrontOfMe.MyData.isPushable)
                         {
-                            // Is it heavy (only pushable alone, no other objects in front or behind it
-                            if (objectInFrontOfMe.IsHeavy)
-                            {
-                                // ToDo
-                            }
-                            else // Not heavy
+                            // get movement speed of object in front of me
+                            newMovementSpeedCalculated = objectInFrontOfMe.AskToMove(direction, newMovementSpeedCalculated, pushOrder);
+                            newMovementSpeedCalculated = Mathf.Min(newMovementSpeedCalculated, myData.moveSpeed);
+
+                            if (newMovementSpeedCalculated > 0f)
                             {
                                 isMoving = true;
                                 pushing = true;
+                                AudioManager.current.Play("BoxPush");
                                 return newMovementSpeedCalculated;
                             }
-                        }
-                        else
-                        {
-                            ResetTargetPosition();
-                            return 0f;
+                            else
+                            {
+                                ResetTargetPosition();
+                                return 0f;
+                            }
                         }
                     }
+                    else // more than one object, e.g. a button, hole and a box on top
+                    {
+                        //ToDo
+                    }
                 }
-                else // more than one object, e.g. a button, hole and a box on top
+                else
                 {
-                    //ToDo
+                    ResetTargetPosition();
+                    return 0f;
                 }
             }
-            else
-            {
-                ResetTargetPosition();
-                return 0f;
-            }
+            return newMovementSpeedCalculated;
         }
-        return newMovementSpeedCalculated;
+        return 0f;
     }
 
 
@@ -209,44 +195,7 @@ public class ObjectGridInteraction : MonoBehaviour
     {
         newMovePosition = transform.position;
     }
-    /*
-    public float AskToMove(Vector2 direction, float forwardedSpeed)
-    {
-        if (!isMoving)
-        {
-            if (CanMoveOnGrid(direction))
-            {
-                newMovePosition = transform.position + (Vector3)direction;
-                List<GameObject> objectsInPath = CheckForObjectsOnTargetPosition(newMovePosition);
 
-                if (objectsInPath.Count == 0)
-                {
-                    isMoving = true;
-                    if (this.transform.CompareTag("Player"))
-                    {
-                        EventManager.current.PlayerStartMove();
-                    }
-                    return 0f;
-
-                }
-                else if (objectsInPath.Count == 1)
-                {
-                    ObjectGridInteraction objectInFrontOfMe = objectsInPath[0].GetComponent<ObjectGridInteraction>();
-                    movementSpeedOverwrite = movementSpeed > forwardedSpeed ? movementSpeed : forwardedSpeed;
-
-                    if (objectInFrontOfMe.AskToMove(direction, movementSpeedOverwrite) > 0f && objectInFrontOfMe.isPushable)
-                    {
-                        isMoving = true;
-                        pushing = true;
-                        return movementSpeedOverwrite;
-                    }
-                }
-            }
-        }
-        newMovePosition = transform.position;
-        return 0f;
-    }
-    */
 
     private bool CanMoveOnGrid(Vector2 direction)
     {
@@ -274,10 +223,7 @@ public class ObjectGridInteraction : MonoBehaviour
             {
                 //This is the game object you collided with
                 GameObject go = colliders[i].gameObject;
-                if (!go.GetComponent<PositionTarget>())
-                {
-                    gameObjects.Add(go);
-                }
+                gameObjects.Add(go);
             }
         }
         return gameObjects;

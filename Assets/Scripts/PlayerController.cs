@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,19 +16,23 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.W))
         {
-            gridInteractor.AskToMove(Vector2.up, playerObject.MovementSpeed);
+            gridInteractor.AskToMove(Vector2.up, playerObject.MyData.moveSpeed);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            gridInteractor.AskToMove(Vector2.left, playerObject.MovementSpeed);
+            gridInteractor.AskToMove(Vector2.left, playerObject.MyData.moveSpeed);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            gridInteractor.AskToMove(Vector2.down, playerObject.MovementSpeed);
+            gridInteractor.AskToMove(Vector2.down, playerObject.MyData.moveSpeed);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            gridInteractor.AskToMove(Vector2.right, playerObject.MovementSpeed);
+            gridInteractor.AskToMove(Vector2.right, playerObject.MyData.moveSpeed);
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(0);
         }
     }
 
