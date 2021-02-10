@@ -10,8 +10,8 @@ public class ObjectGridInteraction : MonoBehaviour
 
     private bool isMoving;
     private bool pushing;
-    private float newMovementSpeedCalculated;
 
+    private float newMovementSpeedCalculated;
     private Vector3 newMovePosition;
 
     private Color gizmoColor;
@@ -53,6 +53,8 @@ public class ObjectGridInteraction : MonoBehaviour
         }
     }
 
+    float xVelocity, yVelocity;
+
     void OnDrawGizmosSelected()
     {
         // Display the explosion radius when selected
@@ -71,6 +73,7 @@ public class ObjectGridInteraction : MonoBehaviour
         {
             Debug.LogError("Boden-Tilemap nicht gefunden!");
         }
+
         if (GameObject.Find("CollisionTilemap"))
         {
             collisionTilemap = GameObject.Find("CollisionTilemap").GetComponent<Tilemap>();
@@ -91,7 +94,7 @@ public class ObjectGridInteraction : MonoBehaviour
     }
 
 
-    void FixedUpdate()
+    void Update()
     {
         if (isMoving)
         {
@@ -100,16 +103,13 @@ public class ObjectGridInteraction : MonoBehaviour
                 transform.position = Vector3.MoveTowards(
                     transform.position,
                     newMovePosition,
-                    newMovementSpeedCalculated * Time.fixedDeltaTime);
+                    newMovementSpeedCalculated * Time.deltaTime);
             }
             else // normal movement, e.g. of player or NPC
             {
-                transform.position = Vector3.MoveTowards(
-                    transform.position,
-                    Vector3.Lerp(transform.position, newMovePosition, myData.moveSpeed),
-                    newMovementSpeedCalculated * Time.fixedDeltaTime);
-
-
+                float newPositionX = Mathf.SmoothDamp(transform.position.x, newMovePosition.x, ref xVelocity, .05f);
+                float newPositionY = Mathf.SmoothDamp(transform.position.y, newMovePosition.y, ref yVelocity, .05f);
+                transform.position = new Vector3(newPositionX, newPositionY, 0);
             }
 
             // If own position near target position, move directly to new position and quit moving task
@@ -118,95 +118,33 @@ public class ObjectGridInteraction : MonoBehaviour
                 isMoving = false;
                 pushing = false;
                 transform.position = newMovePosition;
-
                 EventManager.current.RemoveMovingEntity();
+                if (myData.isPlayable)
+                {
+                    EventManager.current.PlayerFinishMove();
+                }
             }
         }
     }
 
 
-    public float AskToMove(Vector2 direction, float forwardedSpeed, int pushOrder = 0)
+    public void AskToMove(Vector2 direction)
     {
-        if (myData.isPlayable || (myData.isPushable && !myData.isTrigger))
+        if (!isMoving)
         {
-            if (!isMoving)
+            newMovementSpeedCalculated = myData.moveSpeed;
+            if (CanMoveOnGrid(direction))
             {
-                newMovementSpeedCalculated = myData.moveSpeed;
-                if (CanMoveOnGrid(direction))
-                {
-                    // set new position to move to and check if other GameObjects are on this position
-                    newMovePosition = transform.position + (Vector3)direction;
-                    List<GameObject> objectsInPath = CheckForObjectsOnTargetPosition(newMovePosition);
-
-                    if (objectsInPath.Count == 0)
-                    {
-                        isMoving = true;
-                        pushing = false;
-                        EventManager.current.AddMovingEntity();
-                        AudioManager.current.Play("CatMoving");
-                        return newMovementSpeedCalculated;
-                    }
-                    else if (objectsInPath.Count == 1)
-                    {
-                        // Get reference of object in front of this
-                        ObjectGridInteraction objectInFrontOfMe = objectsInPath[0].GetComponent<ObjectGridInteraction>();
-                        // If GameObject is player, you are first in push order. Otherwise increment value
-                        pushOrder = this.gameObject.CompareTag("Player") ? 0 : pushOrder++;
-
-                        // Is object in front of me pushable?
-                        if (objectInFrontOfMe.MyData.isPushable)
-                        {
-                            // get movement speed of object in front of me
-                            newMovementSpeedCalculated = objectInFrontOfMe.AskToMove(direction, newMovementSpeedCalculated, pushOrder);
-                            newMovementSpeedCalculated = Mathf.Min(newMovementSpeedCalculated, myData.moveSpeed);
-
-                            if (newMovementSpeedCalculated > 0f)
-                            {
-                                isMoving = true;
-                                pushing = true;
-                                EventManager.current.AddMovingEntity();
-                                AudioManager.current.Play("BoxPush");
-                                return newMovementSpeedCalculated;
-                            }
-                            else
-                            {
-                                ResetTargetPosition();
-                                return 0f;
-                            }
-                        }
-                        if (objectInFrontOfMe.MyData.isTrigger)
-                        {
-                            isMoving = true;
-                            pushing = false;
-                            EventManager.current.AddMovingEntity();
-                            AudioManager.current.Play("CatMoving");
-                            return newMovementSpeedCalculated;
-                        }
-                    }
-                    else // more than one object, e.g. a button, hole and a box on top
-                    {
-                        //ToDo
-                    }
-                }
-                else
-                {
-                    ResetTargetPosition();
-                    return 0f;
-                }
+                // set new position to move to and check if other GameObjects are on this position
+                newMovePosition = transform.position + (Vector3)direction;
+                isMoving = true;
+                EventManager.current.AddMovingEntity();
             }
-            return newMovementSpeedCalculated;
         }
-        return 0f;
     }
 
 
-    private void ResetTargetPosition()
-    {
-        newMovePosition = transform.position;
-    }
-
-
-    private bool CanMoveOnGrid(Vector2 direction)
+    public bool CanMoveOnGrid(Vector2 direction)
     {
         Vector3Int gridTargetPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
         if (!groundTilemap.HasTile(gridTargetPosition) || collisionTilemap.HasTile(gridTargetPosition))
@@ -238,4 +176,8 @@ public class ObjectGridInteraction : MonoBehaviour
         return gameObjects;
     }
 
+    private void ResetTargetPosition()
+    {
+        newMovePosition = transform.position;
+    }
 }

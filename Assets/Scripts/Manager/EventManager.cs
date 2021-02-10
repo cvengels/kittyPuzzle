@@ -15,76 +15,52 @@ public class EventManager : MonoBehaviour
     public event Action onAddMovingEntity;
     public void AddMovingEntity()
     {
-        if (onAddMovingEntity != null)
-        {
-            onAddMovingEntity();
-        }
+        onAddMovingEntity?.Invoke();
     }
 
     public event Action onRemoveMovingEntity;
     public void RemoveMovingEntity()
     {
-        if (onRemoveMovingEntity != null)
-        {
-            onRemoveMovingEntity();
-        }
+        onRemoveMovingEntity?.Invoke();
     }
 
     public event Action onEnablePlayerMovement;
     public void EnablePlayerMovement()
     {
-        if (onEnablePlayerMovement != null)
-        {
-            onEnablePlayerMovement();
-        }
+        onEnablePlayerMovement?.Invoke();
     }
 
     public event Action onDisablePlayerMovement;
     public void DisablePlayerMovement()
     {
-        if (onDisablePlayerMovement != null)
-        {
-            onDisablePlayerMovement();
-        }
+        onDisablePlayerMovement?.Invoke();
     }
 
     public event Action onSpawnerFinished;
     public void SpawnerFinished()
     {
-        if (onSpawnerFinished != null)
-        {
-            onSpawnerFinished();
-        }
+        onSpawnerFinished?.Invoke();
     }
 
 
     public event Action onPlayerStartMove;
     public void PlayerStartMove()
     {
-        if (onPlayerStartMove != null)
-        {
-            onPlayerStartMove();
-        }
+        onPlayerStartMove?.Invoke();
     }
 
 
     public event Action onPlayerFinishMove;
     public void PlayerFinishMove()
     {
-        if (onPlayerFinishMove != null)
-        {
-            onPlayerFinishMove();
-        }
+        onPlayerFinishMove?.Invoke();
     }
 
 
     public event Action onPlayerReachedGoal;
     public void PlayerReachedGoal()
     {
-        if (onPlayerReachedGoal != null)
-        {
-            onPlayerReachedGoal();
-        }
+        onPlayerReachedGoal?.Invoke();
     }
 
 }
