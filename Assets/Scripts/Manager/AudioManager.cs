@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Audio;
-using System;
+﻿using System;
+using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
@@ -26,12 +25,15 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void Play(string name, float pitch = 1f)
+    public void Play(string name, bool playVariablePitch = true)
     {
         try
         {
             Sound s = Array.Find(sounds, sound => sound.name == name);
-            s.source.pitch = pitch + UnityEngine.Random.Range(0f, .05f);
+            if (playVariablePitch)
+            {
+                s.source.pitch = 1 + UnityEngine.Random.Range(0f, .05f);
+            }
             s.source.Play();
         }
         catch
