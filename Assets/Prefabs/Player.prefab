@@ -12,8 +12,7 @@ GameObject:
   - component: {fileID: 7284744217327797404}
   - component: {fileID: 3251581677854550481}
   - component: {fileID: 2728290336254931905}
-  - component: {fileID: -1007602677090848546}
-  - component: {fileID: 7829086131725504638}
+  - component: {fileID: 3914563487927261693}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -49,6 +48,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movingObjects: 0
   playerCanMove: 0
+  playerMovesHorizontal: 0
+  playerMovesVertical: 0
+  portalBox: {fileID: 7425412222720616817, guid: 34fc7e38fbe7db1469a59ff30d5e5c5d,
+    type: 3}
 --- !u!114 &3251581677854550481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,28 +123,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &-1007602677090848546
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2728290336254931908}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
---- !u!61 &7829086131725504638
+--- !u!61 &3914563487927261693
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -165,5 +147,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.8, y: 0.8}
+  m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0

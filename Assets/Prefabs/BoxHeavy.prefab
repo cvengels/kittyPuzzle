@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -287111682858491104}
   m_Layer: 0
   m_Name: BoxHeavy
-  m_TagString: Untagged
+  m_TagString: Bla
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46,16 +46,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08bf6b47f6c8a834db466e6a629e5736, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  positionTarget: {fileID: 309263998872825885, guid: e2b370e8e22f477499c6d9280483015c,
-    type: 3}
-  nameOfObject: 
-  movementSpeed: 0
-  isPlayable: 0
-  isVulnerable: 0
-  isMassive: 0
-  isPushable: 0
-  isHeavy: 0
-  isHole: 0
+  data:
+    nameOfEntity: 
+    moveSpeed: 0
+    isPlayable: 0
+    isVulnerable: 0
+    isPushable: 0
+    isHeavy: 0
+    isHole: 0
+    isTrigger: 0
 --- !u!212 &455276553164457606
 SpriteRenderer:
   m_ObjectHideFlags: 0

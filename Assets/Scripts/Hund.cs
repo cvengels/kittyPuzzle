@@ -7,7 +7,7 @@ public class Hund : MonoBehaviour
 {
     void Start()
     {
-        EventManager.current.onPlayerFinishMove += WatchAlongView;
+        EventManager.current.onPlayerFinishedMove += WatchAlongView;
     }
 
     private void WatchAlongView()

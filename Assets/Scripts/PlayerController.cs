@@ -13,84 +13,88 @@ public class PlayerController : MonoBehaviour
     }
 
     [SerializeField]
-    private bool playerCanMove;
+    private bool playerIsStandingStill;
     public bool PlayerCanMove
     {
-        get { return playerCanMove; }
+        get { return playerIsStandingStill; }
     }
 
-    private Queue<Vector2> savedMoves;
+    [SerializeField]
+    private bool playerMovesHorizontal;
+    public bool PlayerMovesHorizontal
+    {
+        get { return playerMovesHorizontal; }
+    }
+
+    [SerializeField]
+    private bool playerMovesVertical;
+    public bool PlayerMovesVertical
+    {
+        get { return playerMovesVertical; }
+    }
+
     private bool levelTransition;
 
-    PlayerInput controls;
-    ObjectGridInteraction playerReference;
+    private ObjectGridInteraction playerReference;
+
+    public GameObject portalBox;
 
 
     private void Awake()
     {
         playerReference = GetComponent<ObjectGridInteraction>();
-
-        savedMoves = new Queue<Vector2>();
-
-        controls = new PlayerInput();
-        controls.Player.GridMovement.performed += ctx => AddMove(ctx.ReadValue<Vector2>());
-        controls.Player.ResetLevel.performed += ctx => ResetLevel();
+        PlayerFinishedMove();
     }
 
-    private void Start()
+
+    private void PlayerFinishedMove()
     {
-
+        if (!levelTransition)
+        {
+            playerMovesHorizontal = false;
+            playerMovesVertical = false;
+            playerIsStandingStill = true;
+        }
     }
+
+    private void Update()
+    {
+        if (playerIsStandingStill)
+        {
+            if (Input.GetAxisRaw("Horizontal") != 0f && !playerMovesVertical)
+            {
+                Vector2 direction = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+                if (/*playerReference.CanMoveOnGrid(direction) && */playerReference.AskToMove(direction))
+                {
+                    playerReference.AskToMove(direction);
+                    playerMovesHorizontal = true;
+                    playerIsStandingStill = false;
+                }
+            }
+            else if (Input.GetAxisRaw("Vertical") != 0f && !playerMovesHorizontal)
+            {
+                Vector2 direction = new Vector2(0, Input.GetAxisRaw("Vertical"));
+                if (/*playerReference.CanMoveOnGrid(direction) && */playerReference.AskToMove(direction))
+                {
+                    playerReference.AskToMove(direction);
+                    playerMovesVertical = true;
+                    playerIsStandingStill = false;
+                }
+            }
+        }
+    }
+
 
     private void LevelFinished()
     {
         levelTransition = true;
         DisablePlayerControl();
-        ResetSavedMoves();
     }
 
-    private void ResetLevel()
-    {
-        ResetSavedMoves();
-    }
-
-    private void AddMove(Vector2 newMove)
-    {
-        savedMoves.Enqueue(newMove);
-
-        if (playerCanMove)
-        {
-            LookInQueueForNewMove();
-        }
-    }
-
-    private void LookInQueueForNewMove()
-    {
-        if (savedMoves.Count > 0)
-        {
-            if (playerReference.CanMoveOnGrid(savedMoves.Peek()))
-            {
-                AudioManager.current.Play("CatMoving");
-                playerReference.AskToMove(savedMoves.Dequeue());
-            }
-            else
-            {
-                savedMoves.Dequeue();
-                Debug.Log("Schritt verworfen ...");
-                LookInQueueForNewMove();
-            }
-        }
-    }
-
-    public void ResetSavedMoves()
-    {
-        savedMoves.Clear();
-    }
 
     private void AddMovingEntityInt()
     {
         movingObjects++;
-        //Debug.Log("Moving Objects (Add): " + movingObjects);
         if (movingObjects > 0)
         {
             DisablePlayerControl();
@@ -100,7 +104,6 @@ public class PlayerController : MonoBehaviour
     private void RemoveMovingEntityInt()
     {
         movingObjects--;
-        //Debug.Log("Moving Objects (Del): " + movingObjects);
         if (movingObjects == 0)
         {
             EnablePlayerControl();
@@ -109,32 +112,15 @@ public class PlayerController : MonoBehaviour
 
     private void EnablePlayerControl()
     {
-        //Debug.Log("Spieler-Steuerung freigegeben!");
-
         if (!levelTransition)
         {
-            playerCanMove = true;
+            playerIsStandingStill = true;
         }
     }
 
     private void DisablePlayerControl()
     {
-        Debug.Log("Spieler-Steuerung gesperrt!");
-        playerCanMove = false;
-    }
-
-
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-
-        controls.Enable();
-        EventManager.current.onEnablePlayerMovement += EnablePlayerControl;
-        EventManager.current.onDisablePlayerMovement += DisablePlayerControl;
-        EventManager.current.onPlayerReachedGoal += LevelFinished;
-        EventManager.current.onAddMovingEntity += AddMovingEntityInt;
-        EventManager.current.onRemoveMovingEntity += RemoveMovingEntityInt;
-        EventManager.current.onPlayerFinishMove += LookInQueueForNewMove;
+        playerIsStandingStill = false;
     }
 
     private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -142,16 +128,29 @@ public class PlayerController : MonoBehaviour
         levelTransition = false;
     }
 
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        EventManager.current.onEnablePlayerMovement += EnablePlayerControl;
+        EventManager.current.onDisablePlayerMovement += DisablePlayerControl;
+        EventManager.current.onPlayerReachedGoal += LevelFinished;
+        EventManager.current.onAddMovingEntity += AddMovingEntityInt;
+        EventManager.current.onRemoveMovingEntity += RemoveMovingEntityInt;
+        EventManager.current.onPlayerFinishedMove += PlayerFinishedMove;
+    }
+
+
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        controls.Disable();
         EventManager.current.onEnablePlayerMovement -= EnablePlayerControl;
         EventManager.current.onDisablePlayerMovement -= DisablePlayerControl;
         EventManager.current.onPlayerReachedGoal -= LevelFinished;
         EventManager.current.onAddMovingEntity -= AddMovingEntityInt;
         EventManager.current.onRemoveMovingEntity -= RemoveMovingEntityInt;
-        EventManager.current.onPlayerFinishMove -= LookInQueueForNewMove;
+        EventManager.current.onPlayerFinishedMove -= PlayerFinishedMove;
     }
 }

@@ -76,7 +76,7 @@ public class LevelApprover : MonoBehaviour
                                             if (tmpChild.GetComponent<ObjectGridInteraction>())
                                             {
                                                 ObjectGridInteraction tmpGridInteraction = tmpChild.GetComponent<ObjectGridInteraction>();
-                                                tmpGridInteraction.MyData = new SpawnableObjectBehaviour.PublicProperties(
+                                                tmpGridInteraction.Data = new SpawnableObjectBehaviour.PublicProperties(
                                                     spawner.NameOfEntity.Replace(" ", ""),
                                                     spawner.MoveSpeed,
                                                     spawner.IsPlayable,

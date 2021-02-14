@@ -9,23 +9,25 @@ public class ObjectGridInteraction : MonoBehaviour
     private Tilemap collisionTilemap;
 
     private bool isMoving;
-    private bool pushing;
+    private bool pushing; // if true, use linear movement
 
     private float newMovementSpeedCalculated;
+    private Vector2 oldDirection;
     private Vector3 newMovePosition;
+    float xVelocity, yVelocity;
 
     private Color gizmoColor;
 
 
     [SerializeField]
     private SpawnableObjectBehaviour.PublicProperties myData;
-    public SpawnableObjectBehaviour.PublicProperties MyData
+    public SpawnableObjectBehaviour.PublicProperties Data
     {
         get { return myData; }
         set { myData = value; }
     }
 
-
+    // Give every object category a unique gizmo color
     private int GetSeedFromString(string s)
     {
         string seedInteger = "";
@@ -53,7 +55,6 @@ public class ObjectGridInteraction : MonoBehaviour
         }
     }
 
-    float xVelocity, yVelocity;
 
     void OnDrawGizmosSelected()
     {
@@ -64,7 +65,7 @@ public class ObjectGridInteraction : MonoBehaviour
 
     void Start()
     {
-        // Find tilemaps for the player to walk in the level
+        // Find ground tilemaps
         if (GameObject.Find("GroundTilemap"))
         {
             groundTilemap = GameObject.Find("GroundTilemap").GetComponent<Tilemap>();
@@ -74,6 +75,7 @@ public class ObjectGridInteraction : MonoBehaviour
             Debug.LogError("Boden-Tilemap nicht gefunden!");
         }
 
+        // Find wall tilemaps
         if (GameObject.Find("CollisionTilemap"))
         {
             collisionTilemap = GameObject.Find("CollisionTilemap").GetComponent<Tilemap>();
@@ -89,8 +91,6 @@ public class ObjectGridInteraction : MonoBehaviour
 
         // Reset target position
         ResetTargetPosition();
-
-        //EventManager.current.onMoveTimer += MoveInRandomDirection;
     }
 
 
@@ -107,46 +107,106 @@ public class ObjectGridInteraction : MonoBehaviour
             }
             else // normal movement, e.g. of player or NPC
             {
-                float newPositionX = Mathf.SmoothDamp(transform.position.x, newMovePosition.x, ref xVelocity, .05f);
-                float newPositionY = Mathf.SmoothDamp(transform.position.y, newMovePosition.y, ref yVelocity, .05f);
+                float newPositionX = Mathf.SmoothDamp(transform.position.x, newMovePosition.x, ref xVelocity, 1 / myData.moveSpeed);
+                float newPositionY = Mathf.SmoothDamp(transform.position.y, newMovePosition.y, ref yVelocity, 1 / myData.moveSpeed);
                 transform.position = new Vector3(newPositionX, newPositionY, 0);
             }
 
             // If own position near target position, move directly to new position and quit moving task
-            if (Vector3.Distance(transform.position, newMovePosition) < 0.02f)
+            if (Vector3.Distance(transform.position, newMovePosition) < 0.01f)
             {
                 isMoving = false;
                 pushing = false;
                 transform.position = newMovePosition;
+                oldDirection = Vector2.zero;
                 EventManager.current.RemoveMovingEntity();
                 if (myData.isPlayable)
                 {
-                    EventManager.current.PlayerFinishMove();
+                    EventManager.current.PlayerFinishedMove();
                 }
             }
         }
     }
 
 
-    public void AskToMove(Vector2 direction)
+    public bool AskToMove(Vector2 direction)
     {
         if (!isMoving)
         {
-            newMovementSpeedCalculated = myData.moveSpeed;
             if (CanMoveOnGrid(direction))
             {
-                // set new position to move to and check if other GameObjects are on this position
+                newMovementSpeedCalculated = myData.moveSpeed;
                 newMovePosition = transform.position + (Vector3)direction;
-                isMoving = true;
-                EventManager.current.AddMovingEntity();
+                GameObject[] objectsOnTileInDirection = CheckForObjectsOnTargetPosition(newMovePosition);
+                // Set new position to move to and check if other GameObjects are on this position
+                if (objectsOnTileInDirection.Length == 0)
+                {
+                    isMoving = true;
+
+                    if (myData.isPlayable)
+                    {
+                        AudioManager.current.Play("CatMoving");
+                    }
+                    else if (myData.isPushable)
+                    {
+                        AudioManager.current.Play("BoxPush");
+                    }
+
+                    EventManager.current.AddMovingEntity();
+                    if (myData.isPlayable)
+                    {
+                        EventManager.current.PlayerStartMove();
+                    }
+                    return true;
+                }
+                else // One or more objects found in front of me
+                {
+                    if (direction != oldDirection && myData.isPlayable)
+                    {
+                        List<GameObject[]> objectsInPathQueue = ObjectsInMovePath(newMovePosition, direction);
+                        string objectString = "{ ";
+
+                        // Each GameObject Array on individual Tiles
+                        for (int i = 0; i < objectsInPathQueue.Count; i++)
+                        {
+                            objectString += "[";
+                            // Each GameObject in Array on Tile
+                            for (int j = 0; j < objectsInPathQueue[i].Length; j++)
+                            {
+                                objectString += objectsInPathQueue[i][j].name;
+                                if (j < objectsInPathQueue[j].Length - 1)
+                                {
+                                    objectString += ", ";
+                                }
+                                else
+                                {
+                                    objectString += "]";
+                                }
+                            }
+                            if (i < objectsInPathQueue.Count - 1)
+                            {
+                                objectString += ", ";
+                            }
+                            else
+                            {
+                                objectString += " }";
+                            }
+                        }
+
+                        Debug.LogWarning($"({myData.nameOfEntity}) Objekte vor mir: {objectString} in Richtung ({direction.x}, {direction.y})");
+                        oldDirection = direction;
+                    }
+                }
             }
         }
+        return false;
     }
 
 
-    public bool CanMoveOnGrid(Vector2 direction)
+    public bool CanMoveOnGrid(Vector2 direction, Vector3 customPosition = default)
     {
-        Vector3Int gridTargetPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
+        customPosition = customPosition != default ? customPosition : transform.position;
+        Vector3Int gridTargetPosition = groundTilemap.WorldToCell(customPosition + (Vector3)direction);
         if (!groundTilemap.HasTile(gridTargetPosition) || collisionTilemap.HasTile(gridTargetPosition))
         {
             return false;
@@ -154,30 +214,55 @@ public class ObjectGridInteraction : MonoBehaviour
         return true;
     }
 
+    private List<GameObject[]> ObjectsInMovePath(Vector3 position, Vector2 direction)
+    {
+        Vector3 nextPosition = position;
+        List<GameObject[]> objectQueue = new List<GameObject[]>();
+        while (CheckForObjectsOnTargetPosition(position).Length > 0)
+        {
+            GameObject[] nextObjects = CheckForObjectsOnTargetPosition(nextPosition);
+            if (nextObjects.Length > 0 && CanMoveOnGrid(direction))
+            {
+                objectQueue.Add(nextObjects);
+                nextPosition += (Vector3)direction;
+            }
+        }
+        objectQueue.Add(null);
 
-    private List<GameObject> CheckForObjectsOnTargetPosition(Vector3 targetPosition)
+        return objectQueue;
+    }
+
+
+    private GameObject[] CheckForObjectsOnTargetPosition(Vector3 targetPosition)
     {
         // https://answers.unity.com/questions/383671/find-gameobject-at-position.html
 
         Collider2D[] colliders;
-        List<GameObject> gameObjects = new List<GameObject>(); ;
+        GameObject[] gameObjects;
 
         //Presuming the object you are testing also has a collider 0 otherwise
         colliders = Physics2D.OverlapCircleAll(targetPosition, .2f);
+        gameObjects = new GameObject[colliders.Length];
         if (colliders.Length >= 1)
         {
             for (int i = 0; i < colliders.Length; i++)
             {
                 //This is the game object you collided with
                 GameObject go = colliders[i].gameObject;
-                gameObjects.Add(go);
+                if (!go.CompareTag("Player"))
+                {
+                    gameObjects[i] = go;
+                }
             }
         }
         return gameObjects;
     }
 
+
     private void ResetTargetPosition()
     {
         newMovePosition = transform.position;
     }
+
+
 }

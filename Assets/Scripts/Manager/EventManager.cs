@@ -50,16 +50,17 @@ public class EventManager : MonoBehaviour
     }
 
 
-    public event Action onPlayerFinishMove;
-    public void PlayerFinishMove()
+    public event Action onPlayerFinishedMove;
+    public void PlayerFinishedMove()
     {
-        onPlayerFinishMove?.Invoke();
+        onPlayerFinishedMove?.Invoke();
     }
 
 
     public event Action onPlayerReachedGoal;
     public void PlayerReachedGoal()
     {
+        Debug.Log("EventManager: Level beendet");
         onPlayerReachedGoal?.Invoke();
     }
 

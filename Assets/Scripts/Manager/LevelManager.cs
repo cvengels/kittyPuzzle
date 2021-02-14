@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager current;
-    PlayerInput controls;
 
     public int currentLevel;
 
@@ -13,9 +12,6 @@ public class LevelManager : MonoBehaviour
     {
         DontDestroyOnLoad(this.gameObject);
         current = this;
-
-        controls = new PlayerInput();
-        controls.Player.ResetLevel.performed += ctx => ResetLevel();
     }
 
     private void Start()
@@ -28,7 +24,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Level gewonnen!");
         EventManager.current.DisablePlayerMovement();
         currentLevel++;
-        AudioManager.current.Play("LevelWon", false);
+        AudioManager.current.Play("LevelWon", playVariablePitch: false);
 
         StartCoroutine(LoadNewLevel());
     }
@@ -82,13 +78,11 @@ public class LevelManager : MonoBehaviour
 
     void OnEnable()
     {
-        controls.Enable();
         EventManager.current.onPlayerReachedGoal += LevelFinished;
     }
 
     void OnDisable()
     {
-        controls.Disable();
         EventManager.current.onPlayerReachedGoal -= LevelFinished;
     }
 }
