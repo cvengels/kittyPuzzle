@@ -42,7 +42,7 @@ public class LevelApprover : MonoBehaviour
 
                     // Everything ok with the spawner values
                     int countTiles = 0;
-                    Debug.Log("Objekte vom Typ " + spawner.NameOfEntity + " werden gesucht ...");
+                    //Debug.Log("Objekte vom Typ " + spawner.NameOfEntity + " werden gesucht ...");
 
                     if (tileMap != null && spawner != null)
                     {
@@ -98,7 +98,7 @@ public class LevelApprover : MonoBehaviour
                             {
                                 if (countTiles >= spawner.minimumSpawners)
                                 {
-                                    Debug.Log(countTiles + "x " + spawner.NameOfEntity + " gespawnt");
+                                    //Debug.Log(countTiles + "x " + spawner.NameOfEntity + " gespawnt");
                                 }
                             }
                             // spawn count has to be specific (e.g. start tile)
@@ -114,7 +114,7 @@ public class LevelApprover : MonoBehaviour
                                 // Everything is ok
                                 else if (countTiles >= spawner.minimumSpawners && countTiles <= spawner.maximumSpawners)
                                 {
-                                    Debug.Log(countTiles + "x " + spawner.NameOfEntity + " gespawnt");
+                                    //Debug.Log(countTiles + "x " + spawner.NameOfEntity + " gespawnt");
                                 }
                             }
                         }
@@ -154,7 +154,7 @@ public class LevelApprover : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log("OnSceneLoaded: " + scene.name);
+        //Debug.Log("OnSceneLoaded: " + scene.name);
 
         // Find tilemaps for the player and interactive elements on the grid
         if (GameObject.Find("SpawnerTilemap"))

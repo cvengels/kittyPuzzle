@@ -163,27 +163,35 @@ public class ObjectGridInteraction : MonoBehaviour
                 {
                     if (direction != oldDirection && myData.isPlayable)
                     {
-                        List<GameObject[]> objectsInPathQueue = ObjectsInMovePath(newMovePosition, direction);
-                        string objectString = "{ ";
+                        List<GameObject[]> listOfObjectsInPath = ObjectsInMovePath(transform.position, direction);
+                        /*string objectString = "{ ";
 
                         // Each GameObject Array on individual Tiles
-                        for (int i = 0; i < objectsInPathQueue.Count; i++)
+                        for (int i = 0; i < listOfObjectsInPath.Count; i++)
                         {
                             objectString += "[";
                             // Each GameObject in Array on Tile
-                            for (int j = 0; j < objectsInPathQueue[i].Length; j++)
+                            if (listOfObjectsInPath[i].Length > 0)
                             {
-                                objectString += objectsInPathQueue[i][j].name;
-                                if (j < objectsInPathQueue[j].Length - 1)
+                                for (int j = 0; j < listOfObjectsInPath[i].Length; j++)
                                 {
-                                    objectString += ", ";
-                                }
-                                else
-                                {
-                                    objectString += "]";
+                                    objectString += listOfObjectsInPath[i][j].name;
+                                    if (j < listOfObjectsInPath[j].Length - 1)
+                                    {
+                                        objectString += ", ";
+                                    }
+                                    else
+                                    {
+                                        objectString += "]";
+                                    }
                                 }
                             }
-                            if (i < objectsInPathQueue.Count - 1)
+                            else
+                            {
+                                objectString += "]";
+                            }
+
+                            if (i < listOfObjectsInPath.Count - 1)
                             {
                                 objectString += ", ";
                             }
@@ -193,7 +201,7 @@ public class ObjectGridInteraction : MonoBehaviour
                             }
                         }
 
-                        Debug.LogWarning($"({myData.nameOfEntity}) Objekte vor mir: {objectString} in Richtung ({direction.x}, {direction.y})");
+                        Debug.LogWarning($"({myData.nameOfEntity}) Objekte vor mir: {objectString} in Richtung ({direction.x}, {direction.y})");*/
                         oldDirection = direction;
                     }
                 }
@@ -216,18 +224,44 @@ public class ObjectGridInteraction : MonoBehaviour
 
     private List<GameObject[]> ObjectsInMovePath(Vector3 position, Vector2 direction)
     {
-        Vector3 nextPosition = position;
+        Vector2 nextPosition = position;
+        int safetyLine = 0;
         List<GameObject[]> objectQueue = new List<GameObject[]>();
-        while (CheckForObjectsOnTargetPosition(position).Length > 0)
+        string tmpStr = myData.nameOfEntity;
+
+        do
         {
-            GameObject[] nextObjects = CheckForObjectsOnTargetPosition(nextPosition);
-            if (nextObjects.Length > 0 && CanMoveOnGrid(direction))
+            GameObject[] tmpObj = CheckForObjectsOnTargetPosition(nextPosition + direction);
+            tmpStr += " -> ";
+
+            if (CanMoveOnGrid(direction, nextPosition))
             {
-                objectQueue.Add(nextObjects);
-                nextPosition += (Vector3)direction;
+
+                if (tmpObj.Length > 0)
+                {
+                    tmpStr += "[ ";
+                    foreach (GameObject go in tmpObj)
+                    {
+                        tmpStr += go.GetComponent<ObjectGridInteraction>().name + " ";
+                    }
+                    tmpStr += "]";
+                }
+                else
+                {
+                    tmpStr += " [ empty ] ";
+                }
             }
-        }
-        objectQueue.Add(null);
+            else
+            {
+                tmpStr += " #Wall#";
+            }
+
+            nextPosition += direction;
+            safetyLine++;
+        } while (CanMoveOnGrid(direction, nextPosition) && safetyLine < 100);
+
+        //objectQueue.Add(null);
+        Debug.LogWarning(tmpStr);
 
         return objectQueue;
     }
