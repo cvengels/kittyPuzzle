@@ -164,44 +164,6 @@ public class ObjectGridInteraction : MonoBehaviour
                     if (direction != oldDirection && myData.isPlayable)
                     {
                         List<GameObject[]> listOfObjectsInPath = ObjectsInMovePath(transform.position, direction);
-                        /*string objectString = "{ ";
-
-                        // Each GameObject Array on individual Tiles
-                        for (int i = 0; i < listOfObjectsInPath.Count; i++)
-                        {
-                            objectString += "[";
-                            // Each GameObject in Array on Tile
-                            if (listOfObjectsInPath[i].Length > 0)
-                            {
-                                for (int j = 0; j < listOfObjectsInPath[i].Length; j++)
-                                {
-                                    objectString += listOfObjectsInPath[i][j].name;
-                                    if (j < listOfObjectsInPath[j].Length - 1)
-                                    {
-                                        objectString += ", ";
-                                    }
-                                    else
-                                    {
-                                        objectString += "]";
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                objectString += "]";
-                            }
-
-                            if (i < listOfObjectsInPath.Count - 1)
-                            {
-                                objectString += ", ";
-                            }
-                            else
-                            {
-                                objectString += " }";
-                            }
-                        }
-
-                        Debug.LogWarning($"({myData.nameOfEntity}) Objekte vor mir: {objectString} in Richtung ({direction.x}, {direction.y})");*/
                         oldDirection = direction;
                     }
                 }
