@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,5 +18,15 @@ public class ManagerWatchdog : MonoBehaviour
                 tmpManager.name = go.name;
             }
         }
+    }
+
+    private void Start()
+    {
+        SetOffsetToCamera();
+    }
+
+    private void SetOffsetToCamera()
+    {
+        Camera.main.transform.position = new Vector2(0.001f, 0.001f);
     }
 }

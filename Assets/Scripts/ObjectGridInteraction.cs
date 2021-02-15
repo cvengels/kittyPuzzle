@@ -405,7 +405,7 @@ public class ObjectGridInteraction : MonoBehaviour
         //Presuming the object you are testing also has a collider 0 otherwise
         colliders = Physics2D.OverlapCircleAll(targetPosition, .2f);
         gameObjects = new GameObject[colliders.Length];
-        if (colliders.Length >= 1)
+        if (colliders.Length > 0)
         {
             for (int i = 0; i < colliders.Length; i++)
             {
