@@ -6,11 +6,23 @@ using UnityEngine;
 public class ManagerWatchdog : MonoBehaviour
 {
 
-    public GameObject[] gameManager;
+    public GameObject[] gameManagers;
 
     private void Awake()
     {
-        foreach (GameObject go in gameManager)
+        FindGameManagersInScene(gameManagers);
+    }
+
+
+    private void Start()
+    {
+        SetOffsetToCamera();
+    }
+
+
+    private void FindGameManagersInScene(GameObject[] manager)
+    {
+        foreach (GameObject go in manager)
         {
             if (!GameObject.Find(go.name) && go != null)
             {
@@ -20,13 +32,9 @@ public class ManagerWatchdog : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        SetOffsetToCamera();
-    }
-
     private void SetOffsetToCamera()
     {
+        // Add a little offset to main camera to try to get rid of 
         Camera.main.transform.position = new Vector2(0.001f, 0.001f);
     }
 }
