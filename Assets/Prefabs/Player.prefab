@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movingObjects: 0
-  playerCanMove: 0
+  playerIsStandingStill: 0
   playerMovesHorizontal: 0
   playerMovesVertical: 0
   portalBox: {fileID: 7425412222720616817, guid: 34fc7e38fbe7db1469a59ff30d5e5c5d,
@@ -140,7 +140,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.0666667, y: 1.1666666}
+    oldSize: {x: 0.53333336, y: 0.5833333}
     newSize: {x: 3.2, y: 3.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

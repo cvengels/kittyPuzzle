@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -12,6 +13,8 @@ public class ObjectGridInteraction : MonoBehaviour
     private bool pushing; // if true, use linear movement
 
     private float newMovementSpeedCalculated;
+    private bool isSpeedOverwritten;
+
     private Vector2 oldDirection;
     private Vector3 newMovePosition;
     float xVelocity, yVelocity;
@@ -91,6 +94,11 @@ public class ObjectGridInteraction : MonoBehaviour
 
         // Reset target position
         ResetTargetPosition();
+
+        if (myData.isPushable || myData.isHeavy)
+        {
+            pushing = true;
+        }
     }
 
 
@@ -116,9 +124,17 @@ public class ObjectGridInteraction : MonoBehaviour
             if (Vector3.Distance(transform.position, newMovePosition) < 0.01f)
             {
                 isMoving = false;
-                pushing = false;
+                if (myData.isPushable || myData.isHeavy)
+                {
+                    pushing = true;
+                }
+                else
+                {
+                    pushing = false;
+                }
                 transform.position = newMovePosition;
                 oldDirection = Vector2.zero;
+                isSpeedOverwritten = false;
                 EventManager.current.RemoveMovingEntity();
                 if (myData.isPlayable)
                 {
@@ -135,7 +151,10 @@ public class ObjectGridInteraction : MonoBehaviour
         {
             if (CanMoveOnGrid(direction))
             {
-                newMovementSpeedCalculated = myData.moveSpeed;
+                if (!isSpeedOverwritten)
+                {
+                    newMovementSpeedCalculated = myData.moveSpeed;
+                }
                 newMovePosition = transform.position + (Vector3)direction;
                 GameObject[] objectsOnTileInDirection = CheckForObjectsOnTargetPosition(newMovePosition);
                 // Set new position to move to and check if other GameObjects are on this position
@@ -161,10 +180,36 @@ public class ObjectGridInteraction : MonoBehaviour
                 }
                 else // One or more objects found in front of me
                 {
-                    if (direction != oldDirection && myData.isPlayable)
+                    if (direction != oldDirection && myData.isPlayable /* || myData.isNPC */)
                     {
+                        // Get list of gameobjects in line of sight
                         List<GameObject[]> listOfObjectsInPath = ObjectsInMovePath(transform.position, direction);
-                        oldDirection = direction;
+                        // Filter for movable objects, and check for heavy things
+                        List<GameObject> movableObjects = GetMovableObjectsFromList(listOfObjectsInPath);
+                        if (movableObjects.Count > 0)
+                        {
+                            foreach (GameObject go in movableObjects)
+                            {
+                                ObjectGridInteraction tmp = go.GetComponent<ObjectGridInteraction>();
+                                newMovementSpeedCalculated = Mathf.Min(myData.moveSpeed, tmp.Data.moveSpeed);
+                                tmp.OverwriteMovementSpeed(newMovementSpeedCalculated);
+                            }
+                            foreach (GameObject go in movableObjects)
+                            {
+                                go.GetComponent<ObjectGridInteraction>().AskToMove(direction);
+                            }
+                            isMoving = true;
+                            pushing = true;
+                        }
+                        else
+                        {
+                            oldDirection = direction;
+                        }
+                    }
+                    else if (myData.isPushable || myData.isHeavy)
+                    {
+                        isMoving = true;
+                        pushing = true;
                     }
                 }
             }
@@ -172,6 +217,11 @@ public class ObjectGridInteraction : MonoBehaviour
         return false;
     }
 
+    public void OverwriteMovementSpeed(float newMaximumMoveSpeed)
+    {
+        newMovementSpeedCalculated = newMaximumMoveSpeed;
+        isSpeedOverwritten = true;
+    }
 
     public bool CanMoveOnGrid(Vector2 direction, Vector3 customPosition = default)
     {
@@ -204,7 +254,7 @@ public class ObjectGridInteraction : MonoBehaviour
                     tmpStr += "[ ";
                     foreach (GameObject go in tmpObj)
                     {
-                        tmpStr += go.GetComponent<ObjectGridInteraction>().name + " ";
+                        tmpStr += go.name + " ";
                     }
                     tmpStr += "]";
                 }
@@ -220,12 +270,114 @@ public class ObjectGridInteraction : MonoBehaviour
 
             nextPosition += direction;
             safetyLine++;
+
+            objectQueue.Add(tmpObj);
+
         } while (CanMoveOnGrid(direction, nextPosition) && safetyLine < 100);
 
-        //objectQueue.Add(null);
-        Debug.LogWarning(tmpStr);
+        //Debug.LogWarning(tmpStr);
 
         return objectQueue;
+    }
+
+
+    private List<GameObject> GetMovableObjectsFromList(List<GameObject[]> list)
+    {
+        List<GameObject> newList = new List<GameObject>();
+        List<GameObject> pushList = new List<GameObject>();
+        bool listValidated = true;
+
+        // Filter original list (only pushable objects)
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].Length > 0)
+            {
+                foreach (GameObject go in list[i])
+                {
+                    if (go.GetComponent<ObjectGridInteraction>().Data.isPushable)
+                    {
+                        newList.Add(go);
+                    }
+                    else
+                    {
+                        newList.Add(null);
+                    }
+                }
+            }
+            else
+            {
+                newList.Add(null);
+            }
+        }
+
+        if (newList.Count > 0)
+        {
+            for (int i = 0; i < newList.Count; i++)
+            {
+                if (newList[i] != null && i < newList.Count - 1)
+                {
+                    if (newList[i + 1] != null)
+                    {
+                        listValidated = false;
+                        pushList.Add(newList[i]);
+                        continue;
+                    }
+                    else
+                    {
+                        listValidated = true;
+                        pushList.Add(newList[i]);
+                        break;
+                    }
+                }
+                else
+                {
+                    listValidated = false;
+                    break;
+                }
+            }
+        }
+
+
+        if (pushList.Count > 0 && listValidated)
+        {
+            for (int i = 0; i < pushList.Count; i++)
+            {
+                if (pushList[i] != null && pushList[i].GetComponent<ObjectGridInteraction>().Data.isHeavy)
+                {
+                    listValidated = false;
+                    break;
+                }
+            }
+        }
+
+        if (!listValidated)
+        {
+            Debug.LogWarning("Liste nicht ok!");
+            pushList.Clear();
+        }
+        else
+        {
+            //Debug.LogWarning("Liste hat " + pushList.Count + " Einträge");
+            if (pushList.Count > 0)
+            {
+                string tmpStr = "bewegliche Objekte: " + myData.nameOfEntity;
+
+                for (int i = 0; i < pushList.Count; i++)
+                {
+                    if (pushList[i] != null)
+                    {
+                        tmpStr += " -> [ " + pushList[i].name + " ]";
+                    }
+                    else
+                    {
+                        tmpStr += " -> [ empty ]";
+                    }
+                }
+                Debug.LogWarning(tmpStr);
+            }
+        }
+
+        return pushList;
     }
 
 

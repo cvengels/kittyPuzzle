@@ -82,8 +82,18 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ExchangeAssets();
+        }
     }
 
+    private void ExchangeAssets()
+    {
+        Debug.Log("Magic Magic ...");
+        // ToDo
+    }
 
     private void LevelFinished()
     {
