@@ -3783,6 +3783,30 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1250295838965636489, guid: a066ffc58bd277a47b983e3e4403c13b,
         type: 3}
+    - target: {fileID: 4608188393617711219, guid: 18b6eaf27fce991479acc1d9718a9b6b,
+        type: 3}
+      propertyPath: gameManagers.Array.data[0]
+      value: 
+      objectReference: {fileID: 8352874054986700603, guid: 246b78e6f6e3c68428ba58e21a3b92c8,
+        type: 3}
+    - target: {fileID: 4608188393617711219, guid: 18b6eaf27fce991479acc1d9718a9b6b,
+        type: 3}
+      propertyPath: gameManagers.Array.data[1]
+      value: 
+      objectReference: {fileID: 7915028526686278737, guid: 347003a586f1de54ebf2e577800d3455,
+        type: 3}
+    - target: {fileID: 4608188393617711219, guid: 18b6eaf27fce991479acc1d9718a9b6b,
+        type: 3}
+      propertyPath: gameManagers.Array.data[2]
+      value: 
+      objectReference: {fileID: 9162408030754025933, guid: f26fa738ea76e754a9a98b5e10203985,
+        type: 3}
+    - target: {fileID: 4608188393617711219, guid: 18b6eaf27fce991479acc1d9718a9b6b,
+        type: 3}
+      propertyPath: gameManagers.Array.data[3]
+      value: 
+      objectReference: {fileID: 1250295838965636489, guid: a066ffc58bd277a47b983e3e4403c13b,
+        type: 3}
     - target: {fileID: 9053072336818844033, guid: 18b6eaf27fce991479acc1d9718a9b6b,
         type: 3}
       propertyPath: m_Tiles.Array.size

@@ -174,7 +174,7 @@ public class ObjectGridInteraction : MonoBehaviour
                         }
                         else
                         {
-                            AudioManager.current.Play("BoxPush", 0.6f);
+                            AudioManager.current.Play("BoxPush", 0.5f);
                         }
                     }
 
@@ -195,7 +195,6 @@ public class ObjectGridInteraction : MonoBehaviour
                         List<GameObject[]> listOfObjectsInPath = ObjectsInMovePath(transform.position, direction);
                         // Filter for movable objects, and check for heavy things
                         List<GameObject> movableObjects = GetMovableObjectsFromList(listOfObjectsInPath);
-                        
                         if (movableObjects.Count > 0)
                         {
                             foreach (GameObject go in movableObjects)
@@ -210,6 +209,12 @@ public class ObjectGridInteraction : MonoBehaviour
                             }
                             isMoving = true;
                             pushing = true;
+                        }
+
+                        // Switch to walk on / push objects on it
+                        else if (listOfObjectsInPath[0].Length == 1 && listOfObjectsInPath[0][0].GetComponent<ObjectGridInteraction>().Data.isTrigger)
+                        {
+                            isMoving = true;
                         }
                         else
                         {
