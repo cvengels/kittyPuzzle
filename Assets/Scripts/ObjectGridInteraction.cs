@@ -168,7 +168,14 @@ public class ObjectGridInteraction : MonoBehaviour
                     }
                     else if (myData.isPushable)
                     {
-                        AudioManager.current.Play("BoxPush");
+                        if (!myData.isHeavy)
+                        {
+                            AudioManager.current.Play("BoxPush", 0.8f);
+                        }
+                        else
+                        {
+                            AudioManager.current.Play("BoxPush", 0.6f);
+                        }
                     }
 
                     EventManager.current.AddMovingEntity();
@@ -178,7 +185,9 @@ public class ObjectGridInteraction : MonoBehaviour
                     }
                     return true;
                 }
-                else // One or more objects found in front of me
+
+                // One or more objects found in front of me
+                else
                 {
                     if (direction != oldDirection && myData.isPlayable /* || myData.isNPC */)
                     {
@@ -186,6 +195,7 @@ public class ObjectGridInteraction : MonoBehaviour
                         List<GameObject[]> listOfObjectsInPath = ObjectsInMovePath(transform.position, direction);
                         // Filter for movable objects, and check for heavy things
                         List<GameObject> movableObjects = GetMovableObjectsFromList(listOfObjectsInPath);
+                        
                         if (movableObjects.Count > 0)
                         {
                             foreach (GameObject go in movableObjects)
@@ -337,8 +347,12 @@ public class ObjectGridInteraction : MonoBehaviour
             }
         }
 
-
-        if (pushList.Count > 0 && listValidated)
+        // Look for ONE heavy object
+        if (pushList.Count == 1 && listValidated && pushList[0].GetComponent<ObjectGridInteraction>().Data.isHeavy)
+        {
+            listValidated = true;
+        }
+        else if (pushList.Count > 1 && listValidated)
         {
             for (int i = 0; i < pushList.Count; i++)
             {

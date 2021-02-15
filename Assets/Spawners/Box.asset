@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   publicProperties:
     nameOfEntity: Leerer Karton
-    moveSpeed: 5
+    moveSpeed: 3
     isPlayable: 0
     isVulnerable: 0
     isPushable: 1
