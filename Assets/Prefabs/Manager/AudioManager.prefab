@@ -61,11 +61,11 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: MM_PLAY
     clip: {fileID: 8300000, guid: f4f752b6d247c184f9c52b828d63fbe6, type: 3}
-    volume: 1
+    volume: 0.2
     pitch: 1
     source: {fileID: 0}
   - name: MM_Default
     clip: {fileID: 8300000, guid: 612ac35181b64e6469ce7fd69afc934e, type: 3}
-    volume: 1
+    volume: 0.2
     pitch: 1
     source: {fileID: 0}

@@ -2,21 +2,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ManagerWatchdog : MonoBehaviour
 {
+    Animator transition;
 
     public GameObject[] gameManagers;
 
     private void Awake()
     {
         FindGameManagersInScene(gameManagers);
+
+        EventManager.current.onPlayerReachedGoal += LevelFinished;
+        SceneManager.activeSceneChanged += NewLevelLoaded;
     }
 
+    private void NewLevelLoaded(Scene arg0, Scene arg1)
+    {
+        transition = GameObject.FindObjectOfType<Animator>().GetComponent<Animator>();
+    }
+
+    private void LevelFinished()
+    {
+        transition.SetTrigger("Start");
+    }
 
     private void Start()
     {
         SetOffsetToCamera();
+        transition = GameObject.FindObjectOfType<Animator>().GetComponent<Animator>();
+        transition.SetTrigger("End");
     }
 
 

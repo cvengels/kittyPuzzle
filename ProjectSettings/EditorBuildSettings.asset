@@ -23,6 +23,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Easy4.unity
     guid: e8257f0c13822454a95f349f453a82a1
+  - enabled: 1
+    path: Assets/Scenes/Medium1.unity
+    guid: 316c9623d4154a147b6a5217fd5fda5a
+  - enabled: 1
+    path: Assets/Scenes/Medium2.unity
+    guid: 04ad500356e212848a7b598bde3633e6
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: f9e5fab9b637d5c408c9c8e416b04b3b,
       type: 2}

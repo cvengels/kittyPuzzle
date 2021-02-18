@@ -1,0 +1,16 @@
+{
+"companyName": "School Of Games",
+"productName": "Kitten Lost In Place",
+"productVersion": "0.1",
+"dataUrl": "Build_WebGL.data.unityweb",
+"wasmCodeUrl": "Build_WebGL.wasm.code.unityweb",
+"wasmFrameworkUrl": "Build_WebGL.wasm.framework.unityweb",
+"graphicsAPI": ["WebGL 2.0","WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Light",
+"backgroundColor": "#828080",
+"cacheControl": {"default": "must-revalidate"},
+"developmentBuild": false,
+"multithreading": false,
+"unityVersion": "2019.4.18f1"
+}

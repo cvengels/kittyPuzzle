@@ -8,6 +8,11 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
         AudioManager.current.Play("MM_PLAY", playVariablePitch: false);
+        EventManager.current.PlayerReachedGoal();
+
+
+        // BITTE NACH RELEASE ANDERS LÖSEN!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         StartCoroutine(LevelManager.current.LoadNewLevel());
     }
 

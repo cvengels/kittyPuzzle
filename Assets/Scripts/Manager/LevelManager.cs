@@ -6,6 +6,8 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager current;
 
+    Animator transition;
+
 
     void Awake()
     {
@@ -22,7 +24,10 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("Level gewonnen!");
         EventManager.current.DisablePlayerMovement();
-        AudioManager.current.Play("LevelWon", playVariablePitch: false);
+        if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("MainMenu"))
+        {
+            AudioManager.current.Play("LevelWon", playVariablePitch: false);
+        }
 
         StartCoroutine(LoadNewLevel());
     }
@@ -33,7 +38,7 @@ public class LevelManager : MonoBehaviour
         {
             Transform[] tmpChild = GameObject.Find("NextLevel").GetComponentsInChildren<Transform>();
             // Do we have a GameObject NextLevel with one child?
-            if (tmpChild.Length > 0 && index <= tmpChild.Length)
+            if (tmpChild.Length > 1 && index <= tmpChild.Length)
             {
                 string nameOfNextLevel = tmpChild[0].GetChild(index).name;
                 Debug.Log($"Nächster Level: {nameOfNextLevel}");
@@ -52,34 +57,42 @@ public class LevelManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public IEnumerator LoadNewLevel()
+    public IEnumerator LoadNewLevel(int loadScene = -1)
     {
 
         yield return new WaitForSeconds(1.5f);
 
-        if (FindNextLevelByName() != "")
+        if (loadScene != -1)
         {
             ResetWinSubscription();
-            SceneManager.LoadScene(FindNextLevelByName());
+            SceneManager.LoadScene(loadScene);
         }
         else
         {
-            int nextSceneByIndex = SceneManager.GetActiveScene().buildIndex + 1;
-            if (nextSceneByIndex - 1 <= SceneManager.sceneCount)
+            if (FindNextLevelByName() != "")
             {
                 ResetWinSubscription();
-                SceneManager.LoadScene(nextSceneByIndex);
+                SceneManager.LoadScene(FindNextLevelByName());
             }
             else
             {
-                SceneManager.LoadScene(0);
+                int nextSceneByIndex = SceneManager.GetActiveScene().buildIndex + 1;
+                if (nextSceneByIndex - 1 <= SceneManager.sceneCount)
+                {
+                    ResetWinSubscription();
+                    SceneManager.LoadScene(nextSceneByIndex);
+                }
+                else
+                {
+                    SceneManager.LoadScene(0);
+                }
             }
         }
     }
 
     private void ResetWinSubscription()
     {
-        EventManager.current.onPlayerReachedGoal -= LevelFinished; 
+        EventManager.current.onPlayerReachedGoal -= LevelFinished;
         EventManager.current.onPlayerReachedGoal += LevelFinished;
     }
 

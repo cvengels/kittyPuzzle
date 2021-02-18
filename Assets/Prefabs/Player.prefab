@@ -51,8 +51,6 @@ MonoBehaviour:
   playerCanMove: 0
   playerMovesHorizontal: 0
   playerMovesVertical: 0
-  portalBox: {fileID: 7425412222720616817, guid: 34fc7e38fbe7db1469a59ff30d5e5c5d,
-    type: 3}
 --- !u!114 &3251581677854550481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,7 +111,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 20
-  m_Sprite: {fileID: 2532028833241412679, guid: bf550679b462c464cab01eb51e4d3f29,
+  m_Sprite: {fileID: -8964587473773493253, guid: d130b35bd03c78f4fbdc0fbdceec07b7,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
