@@ -13,10 +13,10 @@ public class PlayerController : MonoBehaviour
     }
 
     [SerializeField]
-    private bool playerIsStandingStill;
+    private bool playerCanMove;
     public bool PlayerCanMove
     {
-        get { return playerIsStandingStill; }
+        get { return playerCanMove; }
     }
 
     [SerializeField]
@@ -37,12 +37,14 @@ public class PlayerController : MonoBehaviour
 
     private ObjectGridInteraction playerReference;
 
-    public GameObject portalBox;
+    private Animator playerAnimation;
+
 
 
     private void Awake()
     {
         playerReference = GetComponent<ObjectGridInteraction>();
+        playerAnimation = GetComponent<Animator>();
         PlayerFinishedMove();
     }
 
@@ -51,41 +53,60 @@ public class PlayerController : MonoBehaviour
     {
         if (!levelTransition)
         {
+            playerAnimation.SetBool("PlayerIsMoving", false);
+
+
             playerMovesHorizontal = false;
             playerMovesVertical = false;
-            playerIsStandingStill = true;
+            playerCanMove = true;
         }
     }
 
     private void Update()
     {
-        if (playerIsStandingStill)
+        if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("MainMenu"))
         {
-            if (Input.GetAxisRaw("Horizontal") != 0f && !playerMovesVertical)
+            if (playerCanMove)
             {
-                Vector2 direction = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-                if (/*playerReference.CanMoveOnGrid(direction) && */playerReference.AskToMove(direction))
+                if (Input.GetAxisRaw("Horizontal") != 0f && !playerMovesVertical)
                 {
-                    playerReference.AskToMove(direction);
-                    playerMovesHorizontal = true;
-                    playerIsStandingStill = false;
+                    Vector2 direction = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+                    if (playerReference.AskToMove(direction))
+                    {
+                        playerReference.AskToMove(direction);
+                        playerAnimation.SetFloat("Vertical", 0f);
+                        playerAnimation.SetFloat("Horizontal", direction.x);
+                        playerAnimation.SetBool("PlayerIsMoving", true);
+                        playerMovesHorizontal = true;
+                        playerCanMove = false;
+                    }
                 }
-            }
-            else if (Input.GetAxisRaw("Vertical") != 0f && !playerMovesHorizontal)
-            {
-                Vector2 direction = new Vector2(0, Input.GetAxisRaw("Vertical"));
-                if (/*playerReference.CanMoveOnGrid(direction) && */playerReference.AskToMove(direction))
+                else if (Input.GetAxisRaw("Vertical") != 0f && !playerMovesHorizontal)
                 {
-                    playerReference.AskToMove(direction);
-                    playerMovesVertical = true;
-                    playerIsStandingStill = false;
-                }
-            }
-        }
+                    Vector2 direction = new Vector2(0, Input.GetAxisRaw("Vertical"));
+                    if (playerReference.AskToMove(direction))
+                    {
+                        playerReference.AskToMove(direction);
 
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            ExchangeAssets();
+                        playerAnimation.SetFloat("Horizontal", 0f);
+                        playerAnimation.SetFloat("Vertical", direction.y);
+
+                        playerAnimation.SetBool("PlayerIsMoving", true);
+                        playerMovesVertical = true;
+                        playerCanMove = false;
+                    }
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                LevelManager.current.ResetLevel();
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                ExchangeAssets();
+            }
         }
     }
 
@@ -124,13 +145,13 @@ public class PlayerController : MonoBehaviour
     {
         if (!levelTransition)
         {
-            playerIsStandingStill = true;
+            playerCanMove = true;
         }
     }
 
     private void DisablePlayerControl()
     {
-        playerIsStandingStill = false;
+        playerCanMove = false;
     }
 
     private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)

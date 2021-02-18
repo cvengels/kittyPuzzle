@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   publicProperties:
     nameOfEntity: Player
-    moveSpeed: 15
+    moveSpeed: 20
     isPlayable: 1
     isVulnerable: 1
     isPushable: 0

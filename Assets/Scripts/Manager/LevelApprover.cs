@@ -154,29 +154,32 @@ public class LevelApprover : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        //Debug.Log("OnSceneLoaded: " + scene.name);
+        if (scene != SceneManager.GetSceneByName("MainMenu"))
+        {
+            //Debug.Log("OnSceneLoaded: " + scene.name);
 
-        // Find tilemaps for the player and interactive elements on the grid
-        if (GameObject.Find("SpawnerTilemap"))
-        {
-            spawnMap = GameObject.Find("SpawnerTilemap").GetComponent<Tilemap>();
-        }
-        else
-        {
-            Debug.LogError("Spawner-Tilemap nicht gefunden!");
-        }
+            // Find tilemaps for the player and interactive elements on the grid
+            if (GameObject.Find("SpawnerTilemap"))
+            {
+                spawnMap = GameObject.Find("SpawnerTilemap").GetComponent<Tilemap>();
+            }
+            else
+            {
+                Debug.LogError("Spawner-Tilemap nicht gefunden!");
+            }
 
-        if (spawnMap != null && spawnableGameObjects != null)
-        {
-            SearchForSpawners(spawnMap, spawnableGameObjects);
-        }
-        else if (spawnMap == null)
-        {
-            Debug.LogError("Tilemap existiert nicht!");
-        }
-        else if (spawnableGameObjects == null)
-        {
-            Debug.LogError("Spawner existieren nicht!");
+            if (spawnMap != null && spawnableGameObjects != null)
+            {
+                SearchForSpawners(spawnMap, spawnableGameObjects);
+            }
+            else if (spawnMap == null)
+            {
+                Debug.LogError("Tilemap existiert nicht!");
+            }
+            else if (spawnableGameObjects == null)
+            {
+                Debug.LogError("Spawner existieren nicht!");
+            }
         }
     }
 }

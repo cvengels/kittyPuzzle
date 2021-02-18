@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3251581677854550481}
   - component: {fileID: 2728290336254931905}
   - component: {fileID: 3914563487927261693}
+  - component: {fileID: 9050879983326442633}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -47,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movingObjects: 0
-  playerIsStandingStill: 0
+  playerCanMove: 0
   playerMovesHorizontal: 0
   playerMovesVertical: 0
   portalBox: {fileID: 7425412222720616817, guid: 34fc7e38fbe7db1469a59ff30d5e5c5d,
@@ -112,7 +113,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 20
-  m_Sprite: {fileID: 21300000, guid: 6556922f7e9f6b542b15d864a6231b6b, type: 3}
+  m_Sprite: {fileID: 2532028833241412679, guid: bf550679b462c464cab01eb51e4d3f29,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -140,7 +142,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.53333336, y: 0.5833333}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 3.2, y: 3.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -149,3 +151,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
+--- !u!95 &9050879983326442633
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2728290336254931908}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 16731c821c824b04d834dfc0d8cfeaa3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

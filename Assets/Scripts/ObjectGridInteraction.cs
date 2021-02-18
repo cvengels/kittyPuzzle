@@ -187,33 +187,39 @@ public class ObjectGridInteraction : MonoBehaviour
                 }
 
                 // One or more objects found in front of me
-                else
+                else 
                 {
                     if (direction != oldDirection && myData.isPlayable /* || myData.isNPC */)
                     {
                         // Get list of gameobjects in line of sight
                         List<GameObject[]> listOfObjectsInPath = ObjectsInMovePath(transform.position, direction);
+
                         // Filter for movable objects, and check for heavy things
                         List<GameObject> movableObjects = GetMovableObjectsFromList(listOfObjectsInPath);
+
                         if (movableObjects.Count > 0)
                         {
+                            // look for maximum movement speed of all objects
                             foreach (GameObject go in movableObjects)
                             {
                                 ObjectGridInteraction tmp = go.GetComponent<ObjectGridInteraction>();
                                 newMovementSpeedCalculated = Mathf.Min(myData.moveSpeed, tmp.Data.moveSpeed);
                                 tmp.OverwriteMovementSpeed(newMovementSpeedCalculated);
                             }
+                            // Move all objects
                             foreach (GameObject go in movableObjects)
                             {
                                 go.GetComponent<ObjectGridInteraction>().AskToMove(direction);
                             }
                             isMoving = true;
                             pushing = true;
+                            return true;
                         }
-
+                        
                         // Switch to walk on / push objects on it
-                        else if (listOfObjectsInPath[0].Length == 1 && listOfObjectsInPath[0][0].GetComponent<ObjectGridInteraction>().Data.isTrigger)
+                        else if (myData.isPlayable && listOfObjectsInPath[0][0].GetComponent<ObjectGridInteraction>().Data.isTrigger)
                         {
+                            
                             isMoving = true;
                         }
                         else
@@ -221,8 +227,10 @@ public class ObjectGridInteraction : MonoBehaviour
                             oldDirection = direction;
                         }
                     }
+
                     else if (myData.isPushable || myData.isHeavy)
                     {
+                        
                         isMoving = true;
                         pushing = true;
                     }
@@ -278,10 +286,6 @@ public class ObjectGridInteraction : MonoBehaviour
                     tmpStr += " [ empty ] ";
                 }
             }
-            else
-            {
-                tmpStr += " #Wall#";
-            }
 
             nextPosition += direction;
             safetyLine++;
@@ -290,7 +294,7 @@ public class ObjectGridInteraction : MonoBehaviour
 
         } while (CanMoveOnGrid(direction, nextPosition) && safetyLine < 100);
 
-        //Debug.LogWarning(tmpStr);
+        Debug.LogWarning(tmpStr);
 
         return objectQueue;
     }
@@ -383,14 +387,7 @@ public class ObjectGridInteraction : MonoBehaviour
 
                 for (int i = 0; i < pushList.Count; i++)
                 {
-                    if (pushList[i] != null)
-                    {
-                        tmpStr += " -> [ " + pushList[i].name + " ]";
-                    }
-                    else
-                    {
-                        tmpStr += " -> [ empty ]";
-                    }
+                    tmpStr += " -> [ " + pushList[i].name + " ]";
                 }
                 Debug.LogWarning(tmpStr);
             }

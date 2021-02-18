@@ -35,6 +35,6 @@ public class ManagerWatchdog : MonoBehaviour
     private void SetOffsetToCamera()
     {
         // Add a little offset to main camera to try to get rid of 
-        Camera.main.transform.position = new Vector3(0.001f, 0.001f, -10f);
+        Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + 0.001f, Camera.main.transform.position.y + 0.001f, -10f);
     }
 }

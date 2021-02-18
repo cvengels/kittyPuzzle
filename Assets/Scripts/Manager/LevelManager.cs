@@ -6,7 +6,6 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager current;
 
-    public int currentLevel;
 
     void Awake()
     {
@@ -23,7 +22,6 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("Level gewonnen!");
         EventManager.current.DisablePlayerMovement();
-        currentLevel++;
         AudioManager.current.Play("LevelWon", playVariablePitch: false);
 
         StartCoroutine(LoadNewLevel());
@@ -49,17 +47,19 @@ public class LevelManager : MonoBehaviour
         return "";
     }
 
-    internal static void ResetLevel()
+    public void ResetLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    IEnumerator LoadNewLevel()
+    public IEnumerator LoadNewLevel()
     {
-        yield return new WaitForSeconds(2.0f);
+
+        yield return new WaitForSeconds(1.5f);
 
         if (FindNextLevelByName() != "")
         {
+            ResetWinSubscription();
             SceneManager.LoadScene(FindNextLevelByName());
         }
         else
@@ -67,6 +67,7 @@ public class LevelManager : MonoBehaviour
             int nextSceneByIndex = SceneManager.GetActiveScene().buildIndex + 1;
             if (nextSceneByIndex - 1 <= SceneManager.sceneCount)
             {
+                ResetWinSubscription();
                 SceneManager.LoadScene(nextSceneByIndex);
             }
             else
@@ -76,13 +77,27 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    private void ResetWinSubscription()
+    {
+        EventManager.current.onPlayerReachedGoal -= LevelFinished; 
+        EventManager.current.onPlayerReachedGoal += LevelFinished;
+    }
+
+
+
     void OnEnable()
     {
-        EventManager.current.onPlayerReachedGoal += LevelFinished;
+        if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("MainMenu"))
+        {
+            EventManager.current.onPlayerReachedGoal += LevelFinished;
+        }
     }
 
     void OnDisable()
     {
-        EventManager.current.onPlayerReachedGoal -= LevelFinished;
+        if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("MainMenu"))
+        {
+            EventManager.current.onPlayerReachedGoal -= LevelFinished;
+        }
     }
 }
