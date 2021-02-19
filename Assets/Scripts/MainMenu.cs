@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
@@ -8,10 +6,11 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
         AudioManager.current.Play("MM_PLAY", playVariablePitch: false);
+        
+        
+        // BITTE NACH RELEASE ANDERS LÖSEN!!!!!!!!!!!!!!!!!!!!!!!!!!!
         EventManager.current.PlayerReachedGoal();
 
-
-        // BITTE NACH RELEASE ANDERS LÖSEN!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         StartCoroutine(LevelManager.current.LoadNewLevel());
     }

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42739754d30377f44a4e638f89037820, type: 3}
+  m_Name: TriggerBox
+  m_EditorClassIdentifier: 
+  publicProperties:
+    nameOfEntity: TriggerBox
+    moveSpeed: 0
+    isPlayable: 0
+    isVulnerable: 0
+    isPushable: 0
+    isHeavy: 0
+    isHole: 0
+    isTrigger: 1
+  spawnableGameObject: {fileID: 0}
+  spawnerTile: {fileID: 11400000, guid: bd38a4d3a699fd14baa2a43624e77a9d, type: 2}
+  minimumSpawners: 0
+  maximumSpawners: 0

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -187,7 +186,7 @@ public class ObjectGridInteraction : MonoBehaviour
                 }
 
                 // One or more objects found in front of me
-                else 
+                else
                 {
                     if (direction != oldDirection && myData.isPlayable /* || myData.isNPC */)
                     {
@@ -215,11 +214,11 @@ public class ObjectGridInteraction : MonoBehaviour
                             pushing = true;
                             return true;
                         }
-                        
+
                         // Switch to walk on / push objects on it
                         else if (myData.isPlayable && listOfObjectsInPath[0][0].GetComponent<ObjectGridInteraction>().Data.isTrigger)
                         {
-                            
+
                             isMoving = true;
                         }
                         else
@@ -230,7 +229,7 @@ public class ObjectGridInteraction : MonoBehaviour
 
                     else if (myData.isPushable || myData.isHeavy)
                     {
-                        
+
                         isMoving = true;
                         pushing = true;
                     }
@@ -249,6 +248,7 @@ public class ObjectGridInteraction : MonoBehaviour
     public bool CanMoveOnGrid(Vector2 direction, Vector3 customPosition = default)
     {
         customPosition = customPosition != default ? customPosition : transform.position;
+
         Vector3Int gridTargetPosition = groundTilemap.WorldToCell(customPosition + (Vector3)direction);
         if (!groundTilemap.HasTile(gridTargetPosition) || collisionTilemap.HasTile(gridTargetPosition))
         {
@@ -394,6 +394,28 @@ public class ObjectGridInteraction : MonoBehaviour
         }
 
         return pushList;
+    }
+
+
+    public GameObject GetPushableObjectOnTop()
+    {
+        List<GameObject> gameObjects = new List<GameObject>(CheckForObjectsOnTargetPosition(transform.position));
+
+        if (gameObjects.Count > 0)
+        {
+            for (int i = gameObjects.Count - 1; i >= 0; i--)
+            {
+                if (!gameObjects[i].GetComponent<ObjectGridInteraction>().Data.isPushable)
+                {
+                    gameObjects.Remove(gameObjects[i]);
+                }
+            }
+            if (gameObjects.Count == 1)
+            {
+                return gameObjects[0];
+            }
+        }
+        return null;
     }
 
 

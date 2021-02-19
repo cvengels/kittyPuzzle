@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,7 +7,19 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager current;
 
-    Animator transition;
+    [SerializeField]
+    private int triggerBoxEntities;
+    public int TriggerBoxEntities
+    {
+        get { return triggerBoxEntities; }
+    }
+
+    [SerializeField]
+    private int triggerBoxEntitiesTouched;
+    public int TriggerBoxEntitiesTouched
+    {
+        get { return triggerBoxEntitiesTouched; }
+    }
 
 
     void Awake()
@@ -31,6 +44,18 @@ public class LevelManager : MonoBehaviour
 
         StartCoroutine(LoadNewLevel());
     }
+    
+    
+    private void AddTriggerBox()
+    {
+        triggerBoxEntities++;
+    }
+
+    private void PlayerFinishedMove()
+    {
+
+    }
+
 
     private string FindNextLevelByName(int index = 0)
     {
@@ -100,14 +125,21 @@ public class LevelManager : MonoBehaviour
 
     void OnEnable()
     {
+        EventManager.current.onAddTriggerBox += AddTriggerBox;
+        EventManager.current.onPlayerFinishedMove += PlayerFinishedMove;
+
         if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("MainMenu"))
         {
             EventManager.current.onPlayerReachedGoal += LevelFinished;
         }
     }
 
+
     void OnDisable()
     {
+        EventManager.current.onAddTriggerBox -= AddTriggerBox;
+        EventManager.current.onPlayerFinishedMove -= PlayerFinishedMove;
+
         if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("MainMenu"))
         {
             EventManager.current.onPlayerReachedGoal -= LevelFinished;

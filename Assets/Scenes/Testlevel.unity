@@ -3807,6 +3807,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1250295838965636489, guid: a066ffc58bd277a47b983e3e4403c13b,
         type: 3}
+    - target: {fileID: 6218140550399438972, guid: 18b6eaf27fce991479acc1d9718a9b6b,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 9053072336818844033, guid: 18b6eaf27fce991479acc1d9718a9b6b,
         type: 3}
       propertyPath: m_Tiles.Array.size
